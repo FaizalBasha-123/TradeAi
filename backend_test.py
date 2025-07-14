@@ -477,55 +477,78 @@ class StockAnalysisAPITester:
             return False
 
     def test_error_handling(self):
-        """Test error handling with invalid stock symbols"""
+        """Test error handling with invalid images and data"""
         try:
-            # Test with invalid stock symbol
-            payload = {"symbol": "INVALID123", "exchange": "NASDAQ"}
+            # Test 1: Invalid file type
+            print("🔄 Testing error handling with invalid file type...")
             
-            print("🔄 Testing error handling with invalid stock symbol...")
+            # Create a text file instead of image
+            with open('/app/test_invalid.txt', 'w') as f:
+                f.write("This is not an image")
             
-            response = self.session.post(
-                f"{self.base_url}/analyze-stock",
-                json=payload,
-                headers={"Content-Type": "application/json"}
-            )
+            with open('/app/test_invalid.txt', 'rb') as f:
+                files = {'image': ('test_invalid.txt', f, 'text/plain')}
+                data = {
+                    'symbol': 'AAPL',
+                    'exchange': 'NASDAQ'
+                }
+                
+                response = self.session.post(
+                    f"{self.base_url}/analyze-stock",
+                    files=files,
+                    data=data
+                )
             
             # Should return an error status code (4xx or 5xx)
             if response.status_code >= 400:
-                try:
-                    error_data = response.json()
-                    if "detail" in error_data:
-                        self.log_test(
-                            "Error Handling", 
-                            "PASS", 
-                            "Error handling working correctly for invalid symbols",
-                            f"Status: {response.status_code}, Error: {error_data['detail']}"
-                        )
-                        return True
-                    else:
-                        self.log_test(
-                            "Error Handling", 
-                            "WARN", 
-                            "Error handling works but response format could be improved",
-                            f"Status: {response.status_code}, Response: {response.text}"
-                        )
-                        return True
-                except:
-                    self.log_test(
-                        "Error Handling", 
-                        "WARN", 
-                        "Error handling works but response is not JSON",
-                        f"Status: {response.status_code}, Response: {response.text}"
-                    )
-                    return True
+                self.log_test(
+                    "Error Handling (Invalid File Type)", 
+                    "PASS", 
+                    "Error handling working correctly for invalid file types",
+                    f"Status: {response.status_code}"
+                )
+                error_test_1 = True
             else:
                 self.log_test(
-                    "Error Handling", 
+                    "Error Handling (Invalid File Type)", 
                     "FAIL", 
-                    f"Error handling failed - invalid symbol returned success status {response.status_code}",
-                    f"Response: {response.text}"
+                    f"Error handling failed - invalid file type returned success status {response.status_code}"
                 )
-                return False
+                error_test_1 = False
+            
+            # Test 2: Missing required fields
+            print("🔄 Testing error handling with missing fields...")
+            
+            with open('/app/test_chart.png', 'rb') as f:
+                files = {'image': ('test_chart.png', f, 'image/png')}
+                data = {
+                    'symbol': 'AAPL'
+                    # Missing exchange field
+                }
+                
+                response = self.session.post(
+                    f"{self.base_url}/analyze-stock",
+                    files=files,
+                    data=data
+                )
+            
+            if response.status_code >= 400:
+                self.log_test(
+                    "Error Handling (Missing Fields)", 
+                    "PASS", 
+                    "Error handling working correctly for missing fields",
+                    f"Status: {response.status_code}"
+                )
+                error_test_2 = True
+            else:
+                self.log_test(
+                    "Error Handling (Missing Fields)", 
+                    "FAIL", 
+                    f"Error handling failed - missing fields returned success status {response.status_code}"
+                )
+                error_test_2 = False
+            
+            return error_test_1 and error_test_2
                 
         except Exception as e:
             self.log_test(
