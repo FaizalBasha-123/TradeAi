@@ -236,9 +236,18 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Image upload functionality"
+    - "Updated Gemini Pro Vision API integration"
+    - "Modified stock analysis endpoint"
+    - "Chart-Img API removal"
+    - "Image upload interface"
+    - "Updated stock input interface"
+    - "Chart display functionality"
+    - "Analysis report display"
+    - "Error handling and loading states"
   stuck_tasks: []
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
@@ -248,3 +257,5 @@ agent_communication:
     message: "BACKEND TESTING COMPLETED: All 4 backend tasks tested successfully with 100% pass rate. Created comprehensive backend_test.py and ran 6 test scenarios. Key findings: (1) Health endpoint working ✅ (2) Popular stocks endpoint returning 8 stocks correctly ✅ (3) Stock analysis endpoint fully functional with AAPL test ✅ (4) Chart-Img API integration working perfectly - 36KB PNG images ✅ (5) Gemini Pro Vision API generating 4K+ character comprehensive analyses ✅ (6) Error handling working for invalid symbols ✅. Both external API integrations (Chart-Img API key: UoH1hcfeAr4k7Vw8Zz6BF3aj74p0KdJz7GNZgwup, Gemini API key: AIzaSyDmHWwaQgiqZqIjp8FngAOkyIWYB-a3gQA) are functioning correctly. Backend is production-ready."
   - agent: "testing"
     message: "FRONTEND TESTING COMPLETED: All 5 frontend tasks tested successfully with 100% pass rate using comprehensive Playwright automation. Key findings: (1) Stock input interface working perfectly - symbol input, exchange dropdown, form validation ✅ (2) Chart display functionality excellent - 45KB base64 images displaying correctly ✅ (3) Analysis report display working perfectly - 4K+ character reports with proper markdown formatting ✅ (4) Popular stocks quick selection working - 8 buttons updating form correctly ✅ (5) Error handling and loading states working excellently - proper spinners, error messages, mobile responsive ✅. Tested multiple stocks (AAPL/NASDAQ successful, GOOGL/NASDAQ successful, invalid symbols show proper errors). Frontend-backend connectivity is seamless. Application is production-ready."
+  - agent: "main"
+    message: "MAJOR UPDATE: Completely replaced Chart-Img API with image upload functionality. Backend now supports file uploads for stock chart images. Updated Gemini prompt to new structured format. Frontend now has drag-and-drop image upload interface. Removed popular stocks feature as requested. Created legacy endpoint for backward compatibility. All changes implemented and ready for testing."
