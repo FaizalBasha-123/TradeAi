@@ -568,9 +568,10 @@ class StockAnalysisAPITester:
         tests = [
             ("Health Check", self.test_health_endpoint),
             ("Popular Stocks", self.test_popular_stocks_endpoint),
-            ("Stock Analysis (AAPL)", lambda: self.test_stock_analysis_endpoint("AAPL", "NASDAQ")),
-            ("Chart-Img API Integration", self.test_chart_img_api_integration),
-            ("Gemini Pro Vision API Integration", self.test_gemini_api_integration),
+            ("Image Upload", self.test_image_upload_endpoint),
+            ("Stock Analysis with Image Upload (AAPL)", lambda: self.test_stock_analysis_endpoint("AAPL", "NASDAQ")),
+            ("Legacy Stock Analysis (MSFT)", lambda: self.test_legacy_stock_analysis_endpoint("MSFT", "NASDAQ")),
+            ("Gemini Pro Vision API Integration (New Format)", self.test_gemini_api_integration),
             ("Error Handling", self.test_error_handling),
         ]
         
