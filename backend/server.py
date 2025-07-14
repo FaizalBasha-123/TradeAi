@@ -206,7 +206,7 @@ Please analyze the provided chart image and provide this comprehensive report.
         print(f"Legacy Gemini analysis error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Legacy analysis error: {str(e)}")
 
-# Function to analyze stock using Gemini Pro Vision
+# Function to analyze stock using Gemini Pro Vision (Legacy version)
 async def analyze_stock_with_gemini(symbol: str, exchange: str, chart_image_base64: str) -> str:
     """Analyze stock using Gemini Pro Vision API with new prompt format"""
     try:
