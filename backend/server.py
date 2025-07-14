@@ -360,16 +360,18 @@ async def upload_image(file: UploadFile = File(...)):
         
         return {
             "success": True,
-            "message": "Image uploaded successfully",
+            "message": "✅ Image uploaded successfully! Ready for analysis.",
             "image_data": image_base64,
             "filename": file.filename
         }
         
     except HTTPException as e:
+        # Re-raise HTTPException as is (already user-friendly)
         raise e
     except Exception as e:
         print(f"Upload error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+        user_friendly_error = get_user_friendly_error(str(e))
+        raise HTTPException(status_code=500, detail=user_friendly_error)
 
 # Main endpoint for stock analysis (Updated for image uploads)
 @app.post("/api/analyze-stock", response_model=StockAnalysisResponse)
