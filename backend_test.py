@@ -404,56 +404,64 @@ class StockAnalysisAPITester:
             return False
 
     def test_gemini_api_integration(self):
-        """Test Gemini Pro Vision API integration specifically"""
+        """Test Gemini Pro Vision API integration with new structured format"""
         try:
-            # Test with a simple stock
-            payload = {"symbol": "GOOGL", "exchange": "NASDAQ"}
+            # Test with image upload
+            test_image_path = "/app/test_chart.png"
             
-            print("🔄 Testing Gemini Pro Vision API integration...")
+            print("🔄 Testing Gemini Pro Vision API integration with new format...")
             
-            response = self.session.post(
-                f"{self.base_url}/analyze-stock",
-                json=payload,
-                headers={"Content-Type": "application/json"}
-            )
+            with open(test_image_path, 'rb') as f:
+                files = {'image': ('test_chart.png', f, 'image/png')}
+                data = {
+                    'symbol': 'GOOGL',
+                    'exchange': 'NASDAQ'
+                }
+                
+                response = self.session.post(
+                    f"{self.base_url}/analyze-stock",
+                    files=files,
+                    data=data
+                )
             
             if response.status_code == 200:
                 data = response.json()
                 analysis = data.get("analysis", "")
                 
-                # Check for structured analysis content that indicates Gemini is working
-                gemini_indicators = [
-                    "technical analysis",
-                    "stock analysis",
-                    "recommendation",
-                    "market sentiment",
-                    "price movement",
-                    "trading",
-                    "GOOGL" in analysis.upper()
+                # Check for new structured analysis format indicators
+                new_format_indicators = [
+                    "📊 Stock Analysis Report",
+                    "📌 Symbol:",
+                    "📅 Timeframe:",
+                    "🔍 Exchange:",
+                    "📊 Fundamental Analysis",
+                    "💬 Sentiment Analysis",
+                    "📈 Technical Analysis",
+                    "🕒 Short-Term Recommendation",
+                    "📆 Long-Term Recommendation"
                 ]
                 
-                indicators_found = sum(1 for indicator in gemini_indicators if 
-                                     (indicator if isinstance(indicator, bool) else indicator.lower() in analysis.lower()))
+                indicators_found = sum(1 for indicator in new_format_indicators if indicator in analysis)
                 
-                if len(analysis) > 200 and indicators_found >= 4:
+                if len(analysis) > 200 and indicators_found >= 5:
                     self.log_test(
-                        "Gemini Pro Vision API Integration", 
+                        "Gemini Pro Vision API Integration (New Format)", 
                         "PASS", 
-                        "Gemini Pro Vision API integration working correctly",
-                        f"Analysis length: {len(analysis)} chars, Indicators found: {indicators_found}/7"
+                        "Gemini Pro Vision API with new structured format working correctly",
+                        f"Analysis length: {len(analysis)} chars, Format indicators found: {indicators_found}/9"
                     )
                     return True
                 else:
                     self.log_test(
-                        "Gemini Pro Vision API Integration", 
+                        "Gemini Pro Vision API Integration (New Format)", 
                         "FAIL", 
-                        "Gemini Pro Vision API returned insufficient analysis",
-                        f"Analysis length: {len(analysis)}, Indicators: {indicators_found}/7"
+                        "Gemini Pro Vision API not using new structured format",
+                        f"Analysis length: {len(analysis)}, Format indicators: {indicators_found}/9"
                     )
                     return False
             else:
                 self.log_test(
-                    "Gemini Pro Vision API Integration", 
+                    "Gemini Pro Vision API Integration (New Format)", 
                     "FAIL", 
                     f"Gemini API test failed with status {response.status_code}",
                     f"Response: {response.text}"
@@ -462,7 +470,7 @@ class StockAnalysisAPITester:
                 
         except Exception as e:
             self.log_test(
-                "Gemini Pro Vision API Integration", 
+                "Gemini Pro Vision API Integration (New Format)", 
                 "FAIL", 
                 f"Gemini Pro Vision API integration test failed: {str(e)}"
             )
