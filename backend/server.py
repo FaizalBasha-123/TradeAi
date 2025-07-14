@@ -49,7 +49,27 @@ class StockAnalysisResponse(BaseModel):
 async def health_check():
     return {"status": "active", "message": "Stock Analysis API is running"}
 
-# Function to fetch chart image from Chart-Img API
+# Function to handle uploaded image
+async def process_uploaded_image(image_file: UploadFile) -> str:
+    """Process uploaded image file and return as base64"""
+    try:
+        # Read image content
+        image_content = await image_file.read()
+        
+        # Validate file type
+        if not image_file.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="File must be an image")
+        
+        # Convert to base64
+        image_base64 = base64.b64encode(image_content).decode('utf-8')
+        
+        return image_base64
+        
+    except Exception as e:
+        print(f"Error processing uploaded image: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Image processing error: {str(e)}")
+
+# Function to fetch chart image from Chart-Img API (DEPRECATED - will be removed)
 async def fetch_chart_image(symbol: str, exchange: str) -> str:
     """Fetch stock chart image from Chart-Img API and return as base64"""
     try:
