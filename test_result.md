@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Build a stock analysis web tool that takes stock symbol and exchange, calls Chart-Img API to get chart image, calls Gemini API to analyze the chart, and returns a formatted stock analysis report with chart displayed in browser."
+user_problem_statement: "Analyse the codebase and replace Chart-Img API with image upload functionality. Add upload button for users to upload stock chart images. Replace current Gemini prompt with new structured format for stock analysis. Remove Chart-Img API completely from codebase."
 
 backend:
   - task: "Chart-Img API integration"
