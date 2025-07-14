@@ -12,7 +12,7 @@ from datetime import datetime
 import sys
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://294b83ab-b3ab-4f0b-a87b-86e146600025.preview.emergentagent.com/api"
+BACKEND_URL = "https://5fdbd83b-9dd6-464a-897e-e267fe0789f2.preview.emergentagent.com/api"
 
 class StockAnalysisAPITester:
     def __init__(self):
