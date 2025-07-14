@@ -889,10 +889,13 @@ class StockAnalysisAPITester:
             ("Health Check", self.test_health_endpoint),
             ("Popular Stocks", self.test_popular_stocks_endpoint),
             ("Image Upload", self.test_image_upload_endpoint),
+            ("Enhanced Image Validation", self.test_enhanced_image_validation),
+            ("User-Friendly Error Messages", self.test_user_friendly_error_messages),
+            ("API Key Fallback System", self.test_api_key_fallback_system),
             ("Stock Analysis with Image Upload (AAPL)", lambda: self.test_stock_analysis_endpoint("AAPL", "NASDAQ")),
             ("Legacy Stock Analysis (MSFT)", lambda: self.test_legacy_stock_analysis_endpoint("MSFT", "NASDAQ")),
             ("Gemini Pro Vision API Integration (New Format)", self.test_gemini_api_integration),
-            ("Error Handling", self.test_error_handling),
+            ("Basic Error Handling", self.test_error_handling),
         ]
         
         passed = 0
