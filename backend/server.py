@@ -301,19 +301,19 @@ async def analyze_stock(
 
 # Legacy endpoint for backward compatibility (DEPRECATED)
 @app.post("/api/analyze-stock-legacy", response_model=StockAnalysisResponse)
-async def analyze_stock(request: StockAnalysisRequest):
+async def analyze_stock_legacy(request: StockAnalysisRequest):
     """
-    Analyze a stock by fetching its chart and getting AI-powered analysis
+    Legacy endpoint: Analyze a stock by fetching its chart and getting AI-powered analysis
     """
     try:
-        print(f"Starting analysis for {request.symbol} on {request.exchange}")
+        print(f"Starting legacy analysis for {request.symbol} on {request.exchange}")
         
-        # Step 1: Fetch chart image
+        # Step 1: Fetch chart image (using Chart-Img API for backward compatibility)
         chart_image_base64 = await fetch_chart_image(request.symbol, request.exchange)
         print("Chart image fetched successfully")
         
-        # Step 2: Analyze with Gemini
-        analysis = await analyze_stock_with_gemini(
+        # Step 2: Analyze with Gemini using old prompt format
+        analysis = await analyze_stock_with_gemini_legacy(
             request.symbol, 
             request.exchange, 
             chart_image_base64
