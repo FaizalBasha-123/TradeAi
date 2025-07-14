@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 # API Keys from environment
-CHART_IMG_API_KEY = os.getenv("CHART_IMG_API_KEY", "UoH1hcfeAr4k7Vw8Zz6BF3aj74p0KdJz7GNZgwup")
+CHART_IMG_API_KEY = os.getenv("CHART_IMG_API_KEY")  # Required for chart generation
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyDmHWwaQgiqZqIjp8FngAOkyIWYB-a3gQA")
 
 # Request/Response models
