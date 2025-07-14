@@ -233,11 +233,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "Chart-Img API integration"
-    - "Gemini Pro Vision API integration"
-    - "Stock analysis endpoint"
-    - "Popular stocks endpoint"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
