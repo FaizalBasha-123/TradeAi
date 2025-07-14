@@ -35,6 +35,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyDmHWwaQgiqZqIjp8FngAOkyIWYB-
 class StockAnalysisRequest(BaseModel):
     symbol: str
     exchange: str
+    image_data: Optional[str] = None  # Base64 encoded image data
 
 class StockAnalysisResponse(BaseModel):
     symbol: str
