@@ -309,73 +309,97 @@ class StockAnalysisAPITester:
             )
             return False
 
-    def test_chart_img_api_integration(self):
-        """Test Chart-Img API integration specifically"""
+    def test_legacy_stock_analysis_endpoint(self, symbol="AAPL", exchange="NASDAQ"):
+        """Test the legacy stock analysis endpoint"""
         try:
-            # Test with a known good stock
-            payload = {"symbol": "MSFT", "exchange": "NASDAQ"}
+            payload = {
+                "symbol": symbol,
+                "exchange": exchange
+            }
             
-            print("🔄 Testing Chart-Img API integration...")
+            print(f"🔄 Testing legacy stock analysis for {symbol}/{exchange} (this may take 30-60 seconds)...")
             
             response = self.session.post(
-                f"{self.base_url}/analyze-stock",
+                f"{self.base_url}/analyze-stock-legacy",
                 json=payload,
                 headers={"Content-Type": "application/json"}
             )
             
             if response.status_code == 200:
                 data = response.json()
-                chart_image = data.get("chart_image", "")
                 
-                if chart_image.startswith("data:image/png;base64,"):
-                    base64_data = chart_image.split(",")[1]
-                    try:
-                        decoded_data = base64.b64decode(base64_data)
-                        # Check if it's a valid image (PNG signature)
-                        if decoded_data.startswith(b'\x89PNG'):
-                            self.log_test(
-                                "Chart-Img API Integration", 
-                                "PASS", 
-                                "Chart-Img API integration working correctly",
-                                f"Chart image size: {len(decoded_data)} bytes"
-                            )
-                            return True
-                        else:
-                            self.log_test(
-                                "Chart-Img API Integration", 
-                                "FAIL", 
-                                "Chart-Img API returned invalid PNG data"
-                            )
-                            return False
-                    except Exception as e:
+                # Validate response structure
+                required_fields = ["symbol", "exchange", "chart_image", "analysis", "timestamp"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    # Validate chart image is base64
+                    chart_image = data.get("chart_image", "")
+                    if chart_image.startswith("data:image/png;base64,"):
+                        base64_data = chart_image.split(",")[1]
+                        try:
+                            # Try to decode base64 to validate
+                            base64.b64decode(base64_data)
+                            chart_valid = True
+                        except Exception:
+                            chart_valid = False
+                    else:
+                        chart_valid = False
+                    
+                    # Validate analysis content
+                    analysis = data.get("analysis", "")
+                    analysis_valid = (
+                        len(analysis) > 100 and  # Should be substantial
+                        symbol.upper() in analysis and  # Should mention the stock
+                        any(keyword in analysis.lower() for keyword in [
+                            "technical", "analysis", "price", "stock", "trading", "recommendation"
+                        ])
+                    )
+                    
+                    if chart_valid and analysis_valid:
                         self.log_test(
-                            "Chart-Img API Integration", 
+                            "Legacy Stock Analysis Endpoint", 
+                            "PASS", 
+                            f"Legacy stock analysis working correctly for {symbol}/{exchange}",
+                            f"Analysis length: {len(analysis)} chars, Chart: base64 image"
+                        )
+                        return True
+                    else:
+                        issues = []
+                        if not chart_valid:
+                            issues.append("Invalid chart image format")
+                        if not analysis_valid:
+                            issues.append("Invalid analysis content")
+                        
+                        self.log_test(
+                            "Legacy Stock Analysis Endpoint", 
                             "FAIL", 
-                            f"Chart-Img API returned invalid base64: {str(e)}"
+                            f"Legacy stock analysis validation failed: {', '.join(issues)}",
+                            f"Chart starts with: {chart_image[:50]}..., Analysis length: {len(analysis)}"
                         )
                         return False
                 else:
                     self.log_test(
-                        "Chart-Img API Integration", 
+                        "Legacy Stock Analysis Endpoint", 
                         "FAIL", 
-                        "Chart-Img API returned invalid image format",
-                        f"Chart image starts with: {chart_image[:50]}"
+                        f"Legacy stock analysis response missing fields: {missing_fields}",
+                        f"Response keys: {list(data.keys())}"
                     )
                     return False
             else:
                 self.log_test(
-                    "Chart-Img API Integration", 
+                    "Legacy Stock Analysis Endpoint", 
                     "FAIL", 
-                    f"Chart-Img API test failed with status {response.status_code}",
+                    f"Legacy stock analysis returned status code {response.status_code}",
                     f"Response: {response.text}"
                 )
                 return False
                 
         except Exception as e:
             self.log_test(
-                "Chart-Img API Integration", 
+                "Legacy Stock Analysis Endpoint", 
                 "FAIL", 
-                f"Chart-Img API integration test failed: {str(e)}"
+                f"Legacy stock analysis request failed: {str(e)}"
             )
             return False
 
