@@ -143,21 +143,93 @@ class StockAnalysisAPITester:
             )
             return False
 
-    def test_stock_analysis_endpoint(self, symbol="AAPL", exchange="NASDAQ"):
-        """Test the main stock analysis endpoint"""
+    def test_image_upload_endpoint(self):
+        """Test the image upload endpoint"""
         try:
-            payload = {
-                "symbol": symbol,
-                "exchange": exchange
-            }
+            # Create test image file
+            test_image_path = "/app/test_chart.png"
             
-            print(f"🔄 Testing stock analysis for {symbol}/{exchange} (this may take 30-60 seconds)...")
+            with open(test_image_path, 'rb') as f:
+                files = {'file': ('test_chart.png', f, 'image/png')}
+                
+                print("🔄 Testing image upload endpoint...")
+                
+                response = self.session.post(
+                    f"{self.base_url}/upload-image",
+                    files=files
+                )
             
-            response = self.session.post(
-                f"{self.base_url}/analyze-stock",
-                json=payload,
-                headers={"Content-Type": "application/json"}
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Validate response structure
+                required_fields = ["success", "message", "image_data", "filename"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields and data.get("success") == True:
+                    # Validate image_data is base64
+                    image_data = data.get("image_data", "")
+                    try:
+                        base64.b64decode(image_data)
+                        self.log_test(
+                            "Image Upload Endpoint", 
+                            "PASS", 
+                            "Image upload endpoint working correctly",
+                            f"Filename: {data.get('filename')}, Image data length: {len(image_data)} chars"
+                        )
+                        return True
+                    except Exception:
+                        self.log_test(
+                            "Image Upload Endpoint", 
+                            "FAIL", 
+                            "Image upload returned invalid base64 data"
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "Image Upload Endpoint", 
+                        "FAIL", 
+                        f"Image upload response missing fields or failed: {missing_fields}",
+                        f"Response: {data}"
+                    )
+                    return False
+            else:
+                self.log_test(
+                    "Image Upload Endpoint", 
+                    "FAIL", 
+                    f"Image upload returned status code {response.status_code}",
+                    f"Response: {response.text}"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test(
+                "Image Upload Endpoint", 
+                "FAIL", 
+                f"Image upload request failed: {str(e)}"
             )
+            return False
+
+    def test_stock_analysis_endpoint(self, symbol="AAPL", exchange="NASDAQ"):
+        """Test the main stock analysis endpoint with image upload"""
+        try:
+            # Create test image file
+            test_image_path = "/app/test_chart.png"
+            
+            print(f"🔄 Testing stock analysis for {symbol}/{exchange} with image upload (this may take 30-60 seconds)...")
+            
+            with open(test_image_path, 'rb') as f:
+                files = {'image': ('test_chart.png', f, 'image/png')}
+                data = {
+                    'symbol': symbol,
+                    'exchange': exchange
+                }
+                
+                response = self.session.post(
+                    f"{self.base_url}/analyze-stock",
+                    files=files,
+                    data=data
+                )
             
             if response.status_code == 200:
                 data = response.json()
