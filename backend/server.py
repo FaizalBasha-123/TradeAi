@@ -198,6 +198,46 @@ The chart image is attached below."""
         print(f"Gemini analysis error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Analysis error: {str(e)}")
 
+# Function to analyze stock using Gemini Pro Vision (Legacy version)
+async def analyze_stock_with_gemini_legacy(symbol: str, exchange: str, chart_image_base64: str) -> str:
+    """Legacy analysis using Gemini Pro Vision API with old prompt format"""
+    try:
+        # Create LLM chat instance
+        chat = LlmChat(
+            api_key=GEMINI_API_KEY,
+            session_id=f"stock_analysis_{uuid.uuid4()}",
+            system_message="You are a professional stock market analyst."
+        ).with_model("gemini", "gemini-2.0-flash")
+        
+        # Use legacy prompt format
+        prompt = f"""Analyze this stock chart for {symbol.upper()} ({exchange.upper()}).
+        
+Provide a brief technical analysis covering:
+1. Current trend
+2. Key support and resistance levels
+3. Notable patterns or indicators
+4. Trading recommendation
+
+The chart image is attached below."""
+
+        # Create image content from base64
+        image_content = ImageContent(image_base64=chart_image_base64)
+        
+        # Create user message with prompt and image
+        user_message = UserMessage(
+            text=prompt,
+            file_contents=[image_content]
+        )
+        
+        # Send message to Gemini and get response
+        response = await chat.send_message(user_message)
+        
+        return response
+        
+    except Exception as e:
+        print(f"Legacy Gemini analysis error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Legacy analysis error: {str(e)}")
+
 # Image upload endpoint
 @app.post("/api/upload-image")
 async def upload_image(file: UploadFile = File(...)):
