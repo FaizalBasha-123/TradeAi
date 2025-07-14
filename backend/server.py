@@ -1,75 +1,243 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
-import logging
-from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
-import uuid
+import json
+import base64
+import requests
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from typing import Optional
+from dotenv import load_dotenv
+from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+import asyncio
 from datetime import datetime
+import uuid
 
+# Load environment variables
+load_dotenv()
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+app = FastAPI(title="Stock Analysis API")
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-
-# Create the main app without a prefix
-app = FastAPI()
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
-
-# Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
-
-# Include the router in the main app
-app.include_router(api_router)
-
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# API Keys from environment
+CHART_IMG_API_KEY = os.getenv("CHART_IMG_API_KEY", "UoH1hcfeAr4k7Vw8Zz6BF3aj74p0KdJz7GNZgwup")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyDmHWwaQgiqZqIjp8FngAOkyIWYB-a3gQA")
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+# Request/Response models
+class StockAnalysisRequest(BaseModel):
+    symbol: str
+    exchange: str
+
+class StockAnalysisResponse(BaseModel):
+    symbol: str
+    exchange: str
+    chart_image: str
+    analysis: str
+    timestamp: str
+
+# Health check endpoint
+@app.get("/api/health")
+async def health_check():
+    return {"status": "active", "message": "Stock Analysis API is running"}
+
+# Function to fetch chart image from Chart-Img API
+async def fetch_chart_image(symbol: str, exchange: str) -> str:
+    """Fetch stock chart image from Chart-Img API and return as base64"""
+    try:
+        headers = {
+            "x-api-key": CHART_IMG_API_KEY,
+            "Content-Type": "application/json"
+        }
+        
+        # Construct symbol in the format expected by Chart-Img API
+        full_symbol = f"{exchange.upper()}:{symbol.upper()}"
+        
+        params = {
+            "symbol": full_symbol,
+            "interval": "1D",  # 1 day timeframe as requested
+            "width": 800,
+            "height": 400,
+            "theme": "dark"
+        }
+        
+        print(f"Fetching chart for {full_symbol} with params: {params}")
+        
+        response = requests.get(
+            "https://api.chart-img.com/v1/tradingview/mini-chart",
+            headers=headers,
+            params=params,
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            # Convert image to base64
+            image_base64 = base64.b64encode(response.content).decode('utf-8')
+            return image_base64
+        else:
+            print(f"Chart API error: {response.status_code} - {response.text}")
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"Failed to fetch chart: {response.text}"
+            )
+            
+    except Exception as e:
+        print(f"Error fetching chart: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Chart fetch error: {str(e)}")
+
+# Function to analyze stock using Gemini Pro Vision
+async def analyze_stock_with_gemini(symbol: str, exchange: str, chart_image_base64: str) -> str:
+    """Analyze stock using Gemini Pro Vision API"""
+    try:
+        # Create LLM chat instance
+        chat = LlmChat(
+            api_key=GEMINI_API_KEY,
+            session_id=f"stock_analysis_{uuid.uuid4()}",
+            system_message="You are a professional stock market analyst with expertise in technical analysis, fundamental analysis, and market trends."
+        ).with_model("gemini", "gemini-2.0-flash")
+        
+        # Create structured prompt for comprehensive analysis
+        prompt = f"""
+You are a professional stock market analyst. Generate a comprehensive stock analysis report based on this chart and stock information:
+
+📊 **Stock Information:**
+- Symbol: {symbol.upper()}
+- Exchange: {exchange.upper()}
+- Timeframe: 1 Day
+- Analysis Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+Please provide a detailed analysis in the following structured format:
+
+# 📈 STOCK ANALYSIS REPORT
+
+## 📌 Stock Overview
+- **Symbol:** {symbol.upper()}
+- **Exchange:** {exchange.upper()}
+- **Current Analysis:** 1-Day Chart Analysis
+
+## 🔍 Technical Analysis
+Based on the 1-day chart, analyze:
+- **Price Movement:** Current price trends and patterns
+- **Support/Resistance Levels:** Key price levels to watch
+- **Volume Analysis:** Trading volume patterns
+- **Technical Indicators:** Moving averages, momentum indicators
+- **Chart Patterns:** Any notable formations
+
+## 💹 Market Sentiment
+- **Overall Sentiment:** Bullish/Bearish/Neutral assessment
+- **Market Context:** How this stock fits in current market conditions
+- **Volatility Assessment:** Price stability analysis
+
+## 📊 Key Observations
+- **Notable Price Movements:** Significant changes in the timeframe
+- **Trading Activity:** Volume and liquidity assessment
+- **Risk Factors:** Potential concerns or red flags
+
+## 🎯 Trading Recommendations
+
+### Short-Term (1-3 Days)
+- **Recommendation:** Buy/Hold/Sell
+- **Target Price:** If applicable
+- **Stop Loss:** Risk management level
+- **Rationale:** Brief explanation
+
+### Medium-Term (1-4 Weeks)
+- **Outlook:** Positive/Negative/Neutral
+- **Key Levels:** Important price points to watch
+- **Catalysts:** Events that might impact price
+
+## ⚠️ Risk Assessment
+- **Risk Level:** High/Medium/Low
+- **Key Risks:** Major factors that could affect the stock
+- **Diversification:** Portfolio considerations
+
+## 📋 Summary
+Provide a concise summary of your analysis and key takeaways for investors.
+
+---
+**Disclaimer:** This analysis is for educational purposes only and should not be considered as financial advice. Always consult with a qualified financial advisor before making investment decisions.
+
+Please analyze the provided chart image and provide this comprehensive report.
+"""
+
+        # Create image content from base64
+        image_content = ImageContent(image_base64=chart_image_base64)
+        
+        # Create user message with prompt and image
+        user_message = UserMessage(
+            text=prompt,
+            file_contents=[image_content]
+        )
+        
+        # Send message to Gemini and get response
+        response = await chat.send_message(user_message)
+        
+        return response
+        
+    except Exception as e:
+        print(f"Gemini analysis error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Analysis error: {str(e)}")
+
+# Main endpoint for stock analysis
+@app.post("/api/analyze-stock", response_model=StockAnalysisResponse)
+async def analyze_stock(request: StockAnalysisRequest):
+    """
+    Analyze a stock by fetching its chart and getting AI-powered analysis
+    """
+    try:
+        print(f"Starting analysis for {request.symbol} on {request.exchange}")
+        
+        # Step 1: Fetch chart image
+        chart_image_base64 = await fetch_chart_image(request.symbol, request.exchange)
+        print("Chart image fetched successfully")
+        
+        # Step 2: Analyze with Gemini
+        analysis = await analyze_stock_with_gemini(
+            request.symbol, 
+            request.exchange, 
+            chart_image_base64
+        )
+        print("Analysis completed successfully")
+        
+        # Step 3: Return comprehensive response
+        return StockAnalysisResponse(
+            symbol=request.symbol.upper(),
+            exchange=request.exchange.upper(),
+            chart_image=f"data:image/png;base64,{chart_image_base64}",
+            analysis=analysis,
+            timestamp=datetime.now().isoformat()
+        )
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+# Get popular stocks endpoint
+@app.get("/api/popular-stocks")
+async def get_popular_stocks():
+    """Get a list of popular stocks for quick analysis"""
+    return {
+        "popular_stocks": [
+            {"symbol": "AAPL", "exchange": "NASDAQ", "name": "Apple Inc."},
+            {"symbol": "GOOGL", "exchange": "NASDAQ", "name": "Alphabet Inc."},
+            {"symbol": "MSFT", "exchange": "NASDAQ", "name": "Microsoft Corporation"},
+            {"symbol": "TSLA", "exchange": "NASDAQ", "name": "Tesla Inc."},
+            {"symbol": "AMZN", "exchange": "NASDAQ", "name": "Amazon.com Inc."},
+            {"symbol": "TCS", "exchange": "NSE", "name": "Tata Consultancy Services"},
+            {"symbol": "RELIANCE", "exchange": "NSE", "name": "Reliance Industries"},
+            {"symbol": "INFY", "exchange": "NSE", "name": "Infosys Limited"},
+        ]
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)

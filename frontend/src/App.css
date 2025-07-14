@@ -1,38 +1,245 @@
-.App {
-    text-align: center;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom styles for the Stock Analysis app */
+
+/* Analysis content formatting */
+.analysis-h1 {
+  @apply text-3xl font-bold text-gray-900 mb-4 mt-6 pb-2 border-b-2 border-blue-200;
 }
 
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+.analysis-h2 {
+  @apply text-2xl font-semibold text-gray-800 mb-3 mt-6 text-blue-700;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.analysis-h3 {
+  @apply text-xl font-medium text-gray-700 mb-2 mt-4 text-blue-600;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.prose {
+  @apply text-gray-700 leading-relaxed;
 }
 
-.App-link {
-    color: #61dafb;
+.prose strong {
+  @apply font-semibold text-gray-900;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.prose em {
+  @apply italic text-gray-600;
+}
+
+.prose li {
+  @apply ml-4 mb-1 list-disc list-inside;
+}
+
+/* Custom scrollbar for analysis content */
+.prose::-webkit-scrollbar {
+  width: 8px;
+}
+
+.prose::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.prose::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.prose::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Animation for loading spinner */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom button hover effects */
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+/* Chart image styling */
+.chart-container {
+  @apply relative overflow-hidden rounded-lg shadow-md bg-gray-50;
+}
+
+.chart-container img {
+  @apply transition-transform duration-300 hover:scale-105;
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+  .analysis-h1 {
+    @apply text-2xl;
+  }
+  
+  .analysis-h2 {
+    @apply text-xl;
+  }
+  
+  .analysis-h3 {
+    @apply text-lg;
+  }
+}
+
+/* Loading state improvements */
+.loading-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.loading-content {
+  @apply bg-white rounded-lg p-8 text-center max-w-sm mx-4;
+}
+
+/* Error state styling */
+.error-container {
+  @apply bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg;
+}
+
+.error-icon {
+  @apply text-red-400 text-2xl;
+}
+
+.error-title {
+  @apply text-red-800 font-medium;
+}
+
+.error-message {
+  @apply text-red-700 text-sm mt-1;
+}
+
+/* Success state styling */
+.success-container {
+  @apply bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg;
+}
+
+.success-icon {
+  @apply text-green-400 text-2xl;
+}
+
+.success-title {
+  @apply text-green-800 font-medium;
+}
+
+.success-message {
+  @apply text-green-700 text-sm mt-1;
+}
+
+/* Stock symbol input styling */
+.stock-input {
+  @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200;
+}
+
+.stock-input:focus {
+  @apply outline-none ring-2 ring-blue-500 border-transparent;
+}
+
+/* Quick select buttons */
+.quick-select-button {
+  @apply px-3 py-1 bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 rounded-full text-sm transition duration-200 border hover:border-blue-300;
+}
+
+.quick-select-button:hover {
+  @apply transform scale-105;
+}
+
+/* Analysis report styling */
+.analysis-report {
+  @apply bg-white rounded-xl shadow-lg p-6 space-y-4;
+}
+
+.analysis-section {
+  @apply border-b border-gray-200 pb-4 last:border-b-0;
+}
+
+.analysis-metric {
+  @apply flex justify-between items-center py-2 px-4 bg-gray-50 rounded-lg;
+}
+
+.analysis-metric-label {
+  @apply text-sm font-medium text-gray-600;
+}
+
+.analysis-metric-value {
+  @apply text-sm font-semibold text-gray-900;
+}
+
+/* Responsive chart container */
+.chart-responsive {
+  @apply w-full h-auto max-w-4xl mx-auto;
+}
+
+/* Gradient backgrounds */
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-bg-light {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* Custom shadows */
+.shadow-custom {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Hover effects for cards */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-xl hover:transform hover:scale-105;
+}
+
+/* Analysis content spacing */
+.analysis-content {
+  @apply space-y-6;
+}
+
+.analysis-content h1,
+.analysis-content h2,
+.analysis-content h3 {
+  @apply mb-4;
+}
+
+.analysis-content p {
+  @apply mb-4 leading-relaxed;
+}
+
+.analysis-content ul,
+.analysis-content ol {
+  @apply mb-4 ml-6;
+}
+
+.analysis-content li {
+  @apply mb-2;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+  .chart-responsive {
+    @apply w-full h-auto;
+  }
+  
+  .analysis-h1 {
+    @apply text-xl;
+  }
+  
+  .analysis-h2 {
+    @apply text-lg;
+  }
+  
+  .analysis-h3 {
+    @apply text-base;
+  }
 }
