@@ -27,9 +27,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API Keys from environment
+# API Keys from environment with fallback system
 CHART_IMG_API_KEY = os.getenv("CHART_IMG_API_KEY")  # Required for chart generation
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyDmHWwaQgiqZqIjp8FngAOkyIWYB-a3gQA")
+GEMINI_API_KEYS = [
+    os.getenv("GEMINI_API_KEY", "AIzaSyDmHWwaQgiqZqIjp8FngAOkyIWYB-a3gQA"),  # Primary
+    "AIzaSyABxOKKuIJyZe0-0aw5GMgk-uPpTWuxcsM",  # Backup 1
+    "AIzaSyCMzGNiZz8ncza2JNbot7Dz5sOp5i7S0DI"   # Backup 2
+]
+GEMINI_API_KEY = GEMINI_API_KEYS[0]  # For backward compatibility
 
 # Request/Response models
 class StockAnalysisRequest(BaseModel):
