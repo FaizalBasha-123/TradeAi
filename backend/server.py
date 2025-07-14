@@ -198,8 +198,69 @@ The chart image is attached below."""
         print(f"Gemini analysis error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Analysis error: {str(e)}")
 
-# Main endpoint for stock analysis
+# Image upload endpoint
+@app.post("/api/upload-image")
+async def upload_image(file: UploadFile = File(...)):
+    """Upload and process stock chart image"""
+    try:
+        # Process uploaded image
+        image_base64 = await process_uploaded_image(file)
+        
+        return {
+            "success": True,
+            "message": "Image uploaded successfully",
+            "image_data": image_base64,
+            "filename": file.filename
+        }
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+# Main endpoint for stock analysis (Updated for image uploads)
 @app.post("/api/analyze-stock", response_model=StockAnalysisResponse)
+async def analyze_stock(
+    symbol: str = Form(...),
+    exchange: str = Form(...),
+    image: UploadFile = File(...)
+):
+    """
+    Analyze a stock using uploaded chart image and AI-powered analysis
+    """
+    try:
+        print(f"Starting analysis for {symbol} on {exchange}")
+        
+        # Step 1: Process uploaded image
+        chart_image_base64 = await process_uploaded_image(image)
+        print("Chart image processed successfully")
+        
+        # Step 2: Analyze with Gemini
+        analysis = await analyze_stock_with_gemini(
+            symbol, 
+            exchange, 
+            chart_image_base64
+        )
+        print("Analysis completed successfully")
+        
+        # Step 3: Return comprehensive response
+        return StockAnalysisResponse(
+            symbol=symbol.upper(),
+            exchange=exchange.upper(),
+            chart_image=f"data:image/png;base64,{chart_image_base64}",
+            analysis=analysis,
+            timestamp=datetime.now().isoformat()
+        )
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+# Legacy endpoint for backward compatibility (DEPRECATED)
+@app.post("/api/analyze-stock-legacy", response_model=StockAnalysisResponse)
 async def analyze_stock(request: StockAnalysisRequest):
     """
     Analyze a stock by fetching its chart and getting AI-powered analysis
