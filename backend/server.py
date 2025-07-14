@@ -388,7 +388,7 @@ async def analyze_stock(
         chart_image_base64 = await process_uploaded_image(image)
         print("Chart image processed successfully")
         
-        # Step 2: Analyze with Gemini
+        # Step 2: Analyze with Gemini (with fallback)
         analysis = await analyze_stock_with_gemini(
             symbol, 
             exchange, 
@@ -406,10 +406,12 @@ async def analyze_stock(
         )
         
     except HTTPException as e:
+        # Re-raise HTTPException as is (already user-friendly)
         raise e
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+        user_friendly_error = get_user_friendly_error(str(e))
+        raise HTTPException(status_code=500, detail=user_friendly_error)
 
 # Legacy endpoint for backward compatibility (DEPRECATED)
 @app.post("/api/analyze-stock-legacy", response_model=StockAnalysisResponse)
