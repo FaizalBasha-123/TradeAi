@@ -115,78 +115,70 @@ async def fetch_chart_image(symbol: str, exchange: str) -> str:
 
 # Function to analyze stock using Gemini Pro Vision
 async def analyze_stock_with_gemini(symbol: str, exchange: str, chart_image_base64: str) -> str:
-    """Analyze stock using Gemini Pro Vision API"""
+    """Analyze stock using Gemini Pro Vision API with new prompt format"""
     try:
         # Create LLM chat instance
         chat = LlmChat(
             api_key=GEMINI_API_KEY,
             session_id=f"stock_analysis_{uuid.uuid4()}",
-            system_message="You are a professional stock market analyst with expertise in technical analysis, fundamental analysis, and market trends."
+            system_message="You are a professional stock market analyst."
         ).with_model("gemini", "gemini-2.0-flash")
         
-        # Create structured prompt for comprehensive analysis
-        prompt = f"""
-You are a professional stock market analyst. Generate a comprehensive stock analysis report based on this chart and stock information:
+        # Create new structured prompt for comprehensive analysis
+        prompt = f"""You are a professional stock market analyst.
 
-📊 **Stock Information:**
-- Symbol: {symbol.upper()}
-- Exchange: {exchange.upper()}
-- Timeframe: 1 Day
-- Analysis Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+I will provide you:
+1. A stock chart image (candlestick, 1D interval, last 30 days)
+2. The stock symbol and exchange name
 
-Please provide a detailed analysis in the following structured format:
+Based on the image and information, generate a full stock analysis report in this exact format:
 
-# 📈 STOCK ANALYSIS REPORT
+📊 Stock Analysis Report
 
-## 📌 Stock Overview
-- **Symbol:** {symbol.upper()}
-- **Exchange:** {exchange.upper()}
-- **Current Analysis:** 1-Day Chart Analysis
+📌 Symbol: {symbol.upper()}
+📅 Timeframe: Last 30 Days
+🔍 Exchange: {exchange.upper()}
 
-## 🔍 Technical Analysis
-Based on the 1-day chart, analyze:
-- **Price Movement:** Current price trends and patterns
-- **Support/Resistance Levels:** Key price levels to watch
-- **Volume Analysis:** Trading volume patterns
-- **Technical Indicators:** Moving averages, momentum indicators
-- **Chart Patterns:** Any notable formations
+📊 Fundamental Analysis
+• Revenue Growth YoY: ...
+• Revenue Growth QoQ: ...
+• EPS: ₹... | Projected: ₹...
+• Debt-to-Equity: ... | Interest Coverage: ...
 
-## 💹 Market Sentiment
-- **Overall Sentiment:** Bullish/Bearish/Neutral assessment
-- **Market Context:** How this stock fits in current market conditions
-- **Volatility Assessment:** Price stability analysis
+💬 Sentiment Analysis
+• News Sentiment: 👍/👎 Positive/Negative
+• Reason: ...
+• Social Buzz: ...
 
-## 📊 Key Observations
-- **Notable Price Movements:** Significant changes in the timeframe
-- **Trading Activity:** Volume and liquidity assessment
-- **Risk Factors:** Potential concerns or red flags
+📈 Technical Analysis
+• CMP (Current Market Price): ₹...
+• Breakout Detected: ✅/❌
+• Breakout Date: YYYY-MM-DD
+• RSI: ... | SMA Crossover: ✅/❌
+• Reason: ...
 
-## 🎯 Trading Recommendations
+🕒 Short-Term Recommendation
+• Breakout Detected: ✅/❌
+• Trend: Bullish/Bearish
+• Entry: ₹... | CMP: ₹...
+• Target 1: ₹... | Target 2: ₹...
+• RSI: ... | SMA Crossover: ...
+• 📉 Reason: ...
 
-### Short-Term (1-3 Days)
-- **Recommendation:** Buy/Hold/Sell
-- **Target Price:** If applicable
-- **Stop Loss:** Risk management level
-- **Rationale:** Brief explanation
+📆 Long-Term Recommendation
+• Breakout Detected: ✅/❌
+• Trend: Bullish/Bearish
+• Entry: ₹... | CMP: ₹...
+• Target 1: ₹... | Target 2: ₹...
+• RSI: ... | SMA Crossover: ...
+• 📉 Reason: ...
 
-### Medium-Term (1-4 Weeks)
-- **Outlook:** Positive/Negative/Neutral
-- **Key Levels:** Important price points to watch
-- **Catalysts:** Events that might impact price
+Only return the structured markdown-formatted report. Do not include explanations or extra notes.
 
-## ⚠️ Risk Assessment
-- **Risk Level:** High/Medium/Low
-- **Key Risks:** Major factors that could affect the stock
-- **Diversification:** Portfolio considerations
+Stock Symbol: {symbol.upper()}
+Exchange: {exchange.upper()}
 
-## 📋 Summary
-Provide a concise summary of your analysis and key takeaways for investors.
-
----
-**Disclaimer:** This analysis is for educational purposes only and should not be considered as financial advice. Always consult with a qualified financial advisor before making investment decisions.
-
-Please analyze the provided chart image and provide this comprehensive report.
-"""
+The chart image is attached below."""
 
         # Create image content from base64
         image_content = ImageContent(image_base64=chart_image_base64)
