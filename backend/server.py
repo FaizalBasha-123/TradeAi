@@ -255,21 +255,44 @@ The chart image is attached below."""
 async def process_uploaded_image(image_file: UploadFile) -> str:
     """Process uploaded image file and return as base64"""
     try:
+        # Check file size (limit to 10MB)
+        max_size = 10 * 1024 * 1024  # 10MB in bytes
+        
         # Read image content
         image_content = await image_file.read()
         
+        if len(image_content) > max_size:
+            raise HTTPException(
+                status_code=400, 
+                detail="📁 The uploaded image is too large. Please use an image smaller than 10MB."
+            )
+        
         # Validate file type
-        if not image_file.content_type.startswith('image/'):
-            raise HTTPException(status_code=400, detail="File must be an image")
+        if not image_file.content_type or not image_file.content_type.startswith('image/'):
+            raise HTTPException(
+                status_code=400, 
+                detail="🖼️ Invalid file type. Please upload a valid image file (PNG, JPG, or GIF)."
+            )
+        
+        # Validate file has content
+        if len(image_content) == 0:
+            raise HTTPException(
+                status_code=400, 
+                detail="📁 The uploaded file is empty. Please select a valid image file."
+            )
         
         # Convert to base64
         image_base64 = base64.b64encode(image_content).decode('utf-8')
         
         return image_base64
         
+    except HTTPException as e:
+        # Re-raise HTTPException as is
+        raise e
     except Exception as e:
         print(f"Error processing uploaded image: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Image processing error: {str(e)}")
+        error_msg = get_user_friendly_error(str(e))
+        raise HTTPException(status_code=500, detail=error_msg)
 
 # Function to fetch chart image from Chart-Img API (DEPRECATED - will be removed)
 async def fetch_chart_image(symbol: str, exchange: str) -> str:
