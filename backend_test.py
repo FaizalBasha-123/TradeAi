@@ -1095,7 +1095,7 @@ class StockAnalysisAPITester:
 
     def run_all_tests(self):
         """Run all backend tests"""
-        print("🚀 Starting Backend API Testing Suite")
+        print("🚀 Starting Backend API Testing Suite for Multi-Section Stock Analysis")
         print(f"Backend URL: {self.base_url}")
         print("=" * 60)
         
@@ -1106,10 +1106,12 @@ class StockAnalysisAPITester:
             ("Image Upload", self.test_image_upload_endpoint),
             ("Enhanced Image Validation", self.test_enhanced_image_validation),
             ("User-Friendly Error Messages", self.test_user_friendly_error_messages),
-            ("API Key Fallback System", self.test_api_key_fallback_system),
-            ("Stock Analysis with Image Upload (AAPL)", lambda: self.test_stock_analysis_endpoint("AAPL", "NASDAQ")),
+            ("Multi-Section Analysis Endpoint (AAPL)", lambda: self.test_multi_section_analysis_endpoint("AAPL", "NASDAQ")),
+            ("Multi-Section Analysis Endpoint (TCS)", lambda: self.test_multi_section_analysis_endpoint("TCS", "NSE")),
+            ("Individual Analysis Functions", self.test_individual_analysis_functions),
+            ("Concurrent Execution Performance", self.test_concurrent_execution_performance),
+            ("API Key Fallback for All Sections", self.test_api_key_fallback_for_all_sections),
             ("Legacy Stock Analysis (MSFT)", lambda: self.test_legacy_stock_analysis_endpoint("MSFT", "NASDAQ")),
-            ("Gemini Pro Vision API Integration (New Format)", self.test_gemini_api_integration),
             ("Basic Error Handling", self.test_error_handling),
         ]
         
@@ -1132,11 +1134,27 @@ class StockAnalysisAPITester:
         warnings = sum(1 for result in self.test_results if result["status"] == "WARN")
         
         print("=" * 60)
-        print("📊 TEST SUMMARY")
+        print("📊 MULTI-SECTION ANALYSIS TEST SUMMARY")
         print(f"✅ Passed: {passed}")
         print(f"❌ Failed: {failed}")
         print(f"⚠️  Warnings: {warnings}")
         print(f"📈 Success Rate: {(passed/(passed+failed)*100):.1f}%" if (passed+failed) > 0 else "N/A")
+        
+        # Detailed summary for multi-section features
+        print("\n🔍 MULTI-SECTION FEATURE STATUS:")
+        multi_section_tests = [
+            "Multi-Section Analysis Endpoint (AAPL)",
+            "Multi-Section Analysis Endpoint (TCS)", 
+            "Individual Analysis Functions",
+            "Concurrent Execution Performance",
+            "API Key Fallback for All Sections"
+        ]
+        
+        for test_name in multi_section_tests:
+            test_result = next((r for r in self.test_results if r["test"] == test_name), None)
+            if test_result:
+                status_symbol = "✅" if test_result["status"] == "PASS" else "❌"
+                print(f"  {status_symbol} {test_name}")
         
         return {
             "passed": passed,
