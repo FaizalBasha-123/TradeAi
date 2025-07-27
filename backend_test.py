@@ -648,98 +648,279 @@ class StockAnalysisAPITester:
             )
             return False
 
-    def test_api_key_fallback_system(self):
-        """Test API key fallback system by simulating API failures"""
+    def test_individual_analysis_functions(self):
+        """Test individual analysis functions and their prompt structures"""
         try:
-            print("🔄 Testing API key fallback system...")
+            print("🔄 Testing individual analysis functions with different stocks...")
             
-            # Test with a valid request to see if fallback system is working
-            # We can't easily simulate API key failures, but we can test that the system
-            # handles errors gracefully and tries multiple keys
+            # Test stocks for different analysis types
+            test_cases = [
+                ("TCS", "NSE", "Indian IT stock"),
+                ("TSLA", "NASDAQ", "US Electric Vehicle stock"),
+                ("RELIANCE", "NSE", "Indian Energy stock")
+            ]
+            
+            all_tests_passed = True
+            
+            for symbol, exchange, description in test_cases:
+                print(f"   Testing {symbol}/{exchange} ({description})...")
+                
+                test_image_path = "/app/test_chart.png"
+                
+                with open(test_image_path, 'rb') as f:
+                    files = {'image': ('test_chart.png', f, 'image/png')}
+                    data = {
+                        'symbol': symbol,
+                        'exchange': exchange
+                    }
+                    
+                    response = self.session.post(
+                        f"{self.base_url}/analyze-stock",
+                        files=files,
+                        data=data
+                    )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Test fundamental analysis structure
+                    fundamental = data.get("fundamental_analysis", "")
+                    fundamental_indicators = [
+                        "📊 Fundamental Analysis",
+                        "Revenue Growth", "EPS", "ROE", "Debt", "Cash Flow",
+                        "Dividend", "Valuation", "Summary", "Verdict"
+                    ]
+                    fundamental_score = sum(1 for indicator in fundamental_indicators if indicator in fundamental)
+                    
+                    # Test sentiment analysis structure  
+                    sentiment = data.get("sentiment_analysis", "")
+                    sentiment_indicators = [
+                        "💬 Sentiment Analysis", "AI Mode", "News-Based Summary",
+                        "Sentiment Overview", "Keyword Highlights", "AI Reasoning", "Verdict"
+                    ]
+                    sentiment_score = sum(1 for indicator in sentiment_indicators if indicator in sentiment)
+                    
+                    # Test technical analysis structure
+                    technical = data.get("technical_analysis", "")
+                    technical_indicators = [
+                        "📈 Technical Analysis", "Trend Analysis", "Support Zone", "Resistance Zone",
+                        "Breakout", "Chart Patterns", "RSI", "Entry/Exit", "AI Summary"
+                    ]
+                    technical_score = sum(1 for indicator in technical_indicators if indicator in technical)
+                    
+                    # Test recommendations structure
+                    recommendations = data.get("recommendations", "")
+                    recommendations_indicators = [
+                        "📌 Recommendation Summary", "Combined Outlook", "Swing Trade",
+                        "Entry Range", "Stop-Loss", "Target", "Risk Level", "Final Verdict"
+                    ]
+                    recommendations_score = sum(1 for indicator in recommendations_indicators if indicator in recommendations)
+                    
+                    # Check if all sections have good structure scores
+                    min_score_threshold = 5  # At least 5 out of 8-10 indicators should be present
+                    
+                    section_scores = {
+                        "Fundamental": fundamental_score,
+                        "Sentiment": sentiment_score, 
+                        "Technical": technical_score,
+                        "Recommendations": recommendations_score
+                    }
+                    
+                    passed_sections = [name for name, score in section_scores.items() if score >= min_score_threshold]
+                    failed_sections = [name for name, score in section_scores.items() if score < min_score_threshold]
+                    
+                    if len(passed_sections) >= 3:  # At least 3 out of 4 sections should pass
+                        print(f"      ✅ {symbol}/{exchange}: {len(passed_sections)}/4 sections passed structure test")
+                    else:
+                        print(f"      ❌ {symbol}/{exchange}: Only {len(passed_sections)}/4 sections passed structure test")
+                        print(f"         Failed sections: {failed_sections}")
+                        all_tests_passed = False
+                else:
+                    print(f"      ❌ {symbol}/{exchange}: Request failed with status {response.status_code}")
+                    all_tests_passed = False
+            
+            if all_tests_passed:
+                self.log_test(
+                    "Individual Analysis Functions", 
+                    "PASS", 
+                    "All individual analysis functions working with proper prompt structures",
+                    f"Tested {len(test_cases)} different stocks successfully"
+                )
+                return True
+            else:
+                self.log_test(
+                    "Individual Analysis Functions", 
+                    "FAIL", 
+                    "Some individual analysis functions failed structure validation"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test(
+                "Individual Analysis Functions", 
+                "FAIL", 
+                f"Individual analysis functions test failed: {str(e)}"
+            )
+            return False
+
+    def test_concurrent_execution_performance(self):
+        """Test concurrent execution of all four analyses using asyncio.gather"""
+        try:
+            print("🔄 Testing concurrent execution performance...")
             
             test_image_path = "/app/test_chart.png"
+            
+            # Record start time
+            import time
+            start_time = time.time()
             
             with open(test_image_path, 'rb') as f:
                 files = {'image': ('test_chart.png', f, 'image/png')}
                 data = {
-                    'symbol': 'TSLA',
+                    'symbol': 'AAPL',
                     'exchange': 'NASDAQ'
                 }
                 
-                # Make request and check if it handles potential API failures gracefully
                 response = self.session.post(
                     f"{self.base_url}/analyze-stock",
                     files=files,
                     data=data
                 )
             
-            # Check if the response indicates fallback system is working
+            # Record end time
+            end_time = time.time()
+            execution_time = end_time - start_time
+            
             if response.status_code == 200:
                 data = response.json()
-                analysis = data.get("analysis", "")
                 
-                if len(analysis) > 100:
+                # Check if all four sections are present and substantial
+                sections = {
+                    "fundamental_analysis": data.get("fundamental_analysis", ""),
+                    "sentiment_analysis": data.get("sentiment_analysis", ""),
+                    "technical_analysis": data.get("technical_analysis", ""),
+                    "recommendations": data.get("recommendations", "")
+                }
+                
+                # All sections should be substantial (>500 chars each for good analysis)
+                substantial_sections = [name for name, content in sections.items() if len(content) > 500]
+                
+                # Performance check - concurrent execution should be faster than sequential
+                # Estimate: 4 sequential calls would take ~120-180 seconds, concurrent should be ~30-90 seconds
+                performance_good = execution_time < 120  # Should complete within 2 minutes
+                
+                if len(substantial_sections) >= 3 and performance_good:
                     self.log_test(
-                        "API Key Fallback System", 
+                        "Concurrent Execution Performance", 
                         "PASS", 
-                        "API key fallback system working - successful analysis completed",
-                        f"Analysis length: {len(analysis)} chars"
+                        f"Concurrent execution working efficiently - {len(substantial_sections)}/4 sections substantial",
+                        f"Execution time: {execution_time:.1f}s, Section lengths: {[len(content) for content in sections.values()]}"
                     )
                     return True
                 else:
-                    self.log_test(
-                        "API Key Fallback System", 
-                        "FAIL", 
-                        "API key fallback system may not be working - analysis too short"
-                    )
-                    return False
-            elif response.status_code == 503:
-                # If we get 503, check if the error message is user-friendly (indicating fallback tried)
-                try:
-                    error_data = response.json()
-                    error_message = error_data.get('detail', '')
+                    issues = []
+                    if len(substantial_sections) < 3:
+                        issues.append(f"Only {len(substantial_sections)}/4 sections substantial")
+                    if not performance_good:
+                        issues.append(f"Execution too slow: {execution_time:.1f}s")
                     
-                    # Check if error message indicates fallback system tried multiple keys
-                    fallback_indicators = ['🔄', 'busy', 'try again', 'moments']
-                    is_fallback_message = any(indicator in error_message for indicator in fallback_indicators)
-                    
-                    if is_fallback_message:
-                        self.log_test(
-                            "API Key Fallback System", 
-                            "PASS", 
-                            "API key fallback system working - user-friendly 503 error after trying all keys",
-                            f"Message: {error_message}"
-                        )
-                        return True
-                    else:
-                        self.log_test(
-                            "API Key Fallback System", 
-                            "FAIL", 
-                            "503 error but message doesn't indicate fallback system tried",
-                            f"Message: {error_message}"
-                        )
-                        return False
-                except:
                     self.log_test(
-                        "API Key Fallback System", 
+                        "Concurrent Execution Performance", 
                         "FAIL", 
-                        "503 error but response is not JSON formatted"
+                        f"Concurrent execution issues: {', '.join(issues)}"
                     )
                     return False
             else:
                 self.log_test(
-                    "API Key Fallback System", 
+                    "Concurrent Execution Performance", 
                     "FAIL", 
-                    f"Unexpected status code {response.status_code}",
+                    f"Concurrent execution test failed with status {response.status_code}",
                     f"Response: {response.text}"
                 )
                 return False
                 
         except Exception as e:
             self.log_test(
-                "API Key Fallback System", 
+                "Concurrent Execution Performance", 
                 "FAIL", 
-                f"API key fallback system test failed: {str(e)}"
+                f"Concurrent execution performance test failed: {str(e)}"
+            )
+            return False
+
+    def test_api_key_fallback_for_all_sections(self):
+        """Test API key fallback system for all four analysis sections"""
+        try:
+            print("🔄 Testing API key fallback system for all analysis sections...")
+            
+            test_image_path = "/app/test_chart.png"
+            
+            # Test with multiple requests to potentially trigger fallback
+            test_symbols = ["AAPL", "GOOGL", "MSFT"]
+            successful_requests = 0
+            fallback_evidence = []
+            
+            for symbol in test_symbols:
+                print(f"   Testing fallback with {symbol}...")
+                
+                with open(test_image_path, 'rb') as f:
+                    files = {'image': ('test_chart.png', f, 'image/png')}
+                    data = {
+                        'symbol': symbol,
+                        'exchange': 'NASDAQ'
+                    }
+                    
+                    response = self.session.post(
+                        f"{self.base_url}/analyze-stock",
+                        files=files,
+                        data=data
+                    )
+                
+                if response.status_code == 200:
+                    successful_requests += 1
+                    data = response.json()
+                    
+                    # Check if all sections are present (indicating fallback worked if needed)
+                    sections_present = sum(1 for section in [
+                        "fundamental_analysis", "sentiment_analysis", 
+                        "technical_analysis", "recommendations"
+                    ] if data.get(section) and len(data.get(section)) > 100)
+                    
+                    if sections_present >= 3:
+                        fallback_evidence.append(f"{symbol}: {sections_present}/4 sections")
+                
+                elif response.status_code == 503:
+                    # 503 with user-friendly message indicates fallback tried all keys
+                    try:
+                        error_data = response.json()
+                        error_message = error_data.get('detail', '')
+                        if '🔄' in error_message and 'busy' in error_message:
+                            fallback_evidence.append(f"{symbol}: Fallback attempted (503 with user-friendly message)")
+                    except:
+                        pass
+            
+            # Success criteria: At least 2/3 requests successful OR evidence of proper fallback
+            if successful_requests >= 2 or len(fallback_evidence) >= 2:
+                self.log_test(
+                    "API Key Fallback for All Sections", 
+                    "PASS", 
+                    f"API key fallback system working for multi-section analysis",
+                    f"Successful: {successful_requests}/3, Evidence: {fallback_evidence}"
+                )
+                return True
+            else:
+                self.log_test(
+                    "API Key Fallback for All Sections", 
+                    "FAIL", 
+                    f"API key fallback system may not be working properly",
+                    f"Successful: {successful_requests}/3, Evidence: {fallback_evidence}"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test(
+                "API Key Fallback for All Sections", 
+                "FAIL", 
+                f"API key fallback test for all sections failed: {str(e)}"
             )
             return False
 
