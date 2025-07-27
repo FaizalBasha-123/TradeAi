@@ -10,7 +10,17 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  // Determine backend URL based on environment
+  const getBackendUrl = () => {
+    // For Vercel deployment, use relative API routes
+    if (process.env.NODE_ENV === 'production' && window.location.hostname.includes('vercel.app')) {
+      return '';  // Use relative URLs for Vercel
+    }
+    // For localhost or custom backend URL
+    return process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  };
+
+  const backendUrl = getBackendUrl();
 
   // Handle file selection
   const handleFileSelect = (event) => {
