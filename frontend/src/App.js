@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 const App = () => {
-  const [symbol, setSymbol] = useState('AAPL');
+  const [symbol, setSymbol] = useState('TCS');
   const [exchange, setExchange] = useState('NSE (India)');
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
