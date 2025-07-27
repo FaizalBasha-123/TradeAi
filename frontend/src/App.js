@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 const App = () => {
-  const [symbol, setSymbol] = useState('AAPL');
-  const [exchange, setExchange] = useState('NASDAQ');
+  const [symbol, setSymbol] = useState('TCS');
+  const [exchange, setExchange] = useState('NSE');
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [analysis, setAnalysis] = useState(null);
