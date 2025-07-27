@@ -111,14 +111,14 @@ const App = () => {
     if (!analysis) return null;
     
     switch (activeTab) {
+      case 'recommendations':
+        return analysis.recommendations || 'Recommendations not available';
       case 'fundamental':
         return analysis.fundamental_analysis || 'Fundamental analysis not available';
       case 'sentiment':
         return analysis.sentiment_analysis || 'Sentiment analysis not available';
       case 'technical':
         return analysis.technical_analysis || 'Technical analysis not available';
-      case 'recommendations':
-        return analysis.recommendations || 'Recommendations not available';
       default:
         return 'Please select a tab to view analysis';
     }
