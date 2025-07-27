@@ -273,7 +273,7 @@ const App = () => {
         {/* Analysis Results */}
         {analysis && (
           <div className="space-y-6">
-            {/* Chart Section */}
+            {/* Chart Section - COMMENTED OUT AS REQUESTED
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">
                 📊 {analysis.symbol} Chart ({analysis.exchange})
@@ -289,6 +289,7 @@ const App = () => {
                 Last updated: {new Date(analysis.timestamp).toLocaleString()}
               </p>
             </div>
+            */}
 
             {/* Multi-Section Analysis Report */}
             <div className="bg-white rounded-xl shadow-lg p-6">
