@@ -210,13 +210,13 @@ class StockAnalysisAPITester:
             )
             return False
 
-    def test_stock_analysis_endpoint(self, symbol="AAPL", exchange="NASDAQ"):
-        """Test the main stock analysis endpoint with image upload"""
+    def test_multi_section_analysis_endpoint(self, symbol="AAPL", exchange="NASDAQ"):
+        """Test the new multi-section analysis endpoint with all four analysis types"""
         try:
             # Create test image file
             test_image_path = "/app/test_chart.png"
             
-            print(f"🔄 Testing stock analysis for {symbol}/{exchange} with image upload (this may take 30-60 seconds)...")
+            print(f"🔄 Testing multi-section analysis for {symbol}/{exchange} with image upload (this may take 60-90 seconds)...")
             
             with open(test_image_path, 'rb') as f:
                 files = {'image': ('test_chart.png', f, 'image/png')}
@@ -234,8 +234,11 @@ class StockAnalysisAPITester:
             if response.status_code == 200:
                 data = response.json()
                 
-                # Validate response structure
-                required_fields = ["symbol", "exchange", "chart_image", "analysis", "timestamp"]
+                # Validate response structure for multi-section analysis
+                required_fields = [
+                    "symbol", "exchange", "chart_image", "analysis", "timestamp",
+                    "fundamental_analysis", "sentiment_analysis", "technical_analysis", "recommendations"
+                ]
                 missing_fields = [field for field in required_fields if field not in data]
                 
                 if not missing_fields:
@@ -252,62 +255,93 @@ class StockAnalysisAPITester:
                     else:
                         chart_valid = False
                     
-                    # Validate analysis content
-                    analysis = data.get("analysis", "")
-                    analysis_valid = (
-                        len(analysis) > 100 and  # Should be substantial
-                        symbol.upper() in analysis and  # Should mention the stock
-                        any(keyword in analysis.lower() for keyword in [
-                            "technical", "analysis", "price", "stock", "trading", "recommendation"
-                        ])
-                    )
+                    # Validate all four analysis sections
+                    sections = {
+                        "fundamental_analysis": data.get("fundamental_analysis", ""),
+                        "sentiment_analysis": data.get("sentiment_analysis", ""),
+                        "technical_analysis": data.get("technical_analysis", ""),
+                        "recommendations": data.get("recommendations", "")
+                    }
                     
-                    if chart_valid and analysis_valid:
+                    section_validations = {}
+                    for section_name, content in sections.items():
+                        # Check if content is substantial and contains expected keywords
+                        if section_name == "fundamental_analysis":
+                            expected_keywords = ["revenue", "profit", "eps", "debt", "ratio", "fundamental"]
+                        elif section_name == "sentiment_analysis":
+                            expected_keywords = ["sentiment", "news", "positive", "negative", "neutral", "headlines"]
+                        elif section_name == "technical_analysis":
+                            expected_keywords = ["technical", "trend", "support", "resistance", "rsi", "breakout"]
+                        elif section_name == "recommendations":
+                            expected_keywords = ["recommendation", "entry", "target", "stop", "swing", "trade"]
+                        
+                        is_valid = (
+                            len(content) > 200 and  # Should be substantial
+                            symbol.upper() in content and  # Should mention the stock
+                            any(keyword in content.lower() for keyword in expected_keywords)
+                        )
+                        section_validations[section_name] = is_valid
+                    
+                    # Legacy analysis validation
+                    legacy_analysis = data.get("analysis", "")
+                    legacy_valid = len(legacy_analysis) > 50  # Should have some content
+                    
+                    all_sections_valid = all(section_validations.values())
+                    
+                    if chart_valid and all_sections_valid and legacy_valid:
+                        section_lengths = {name: len(content) for name, content in sections.items()}
                         self.log_test(
-                            "Stock Analysis Endpoint", 
+                            "Multi-Section Analysis Endpoint", 
                             "PASS", 
-                            f"Stock analysis working correctly for {symbol}/{exchange}",
-                            f"Analysis length: {len(analysis)} chars, Chart: base64 image"
+                            f"Multi-section analysis working correctly for {symbol}/{exchange}",
+                            f"All 4 sections generated: {section_lengths}, Chart: base64 image"
                         )
                         return True
                     else:
                         issues = []
                         if not chart_valid:
                             issues.append("Invalid chart image format")
-                        if not analysis_valid:
-                            issues.append("Invalid analysis content")
+                        if not all_sections_valid:
+                            failed_sections = [name for name, valid in section_validations.items() if not valid]
+                            issues.append(f"Invalid sections: {failed_sections}")
+                        if not legacy_valid:
+                            issues.append("Invalid legacy analysis")
                         
                         self.log_test(
-                            "Stock Analysis Endpoint", 
+                            "Multi-Section Analysis Endpoint", 
                             "FAIL", 
-                            f"Stock analysis validation failed: {', '.join(issues)}",
-                            f"Chart starts with: {chart_image[:50]}..., Analysis length: {len(analysis)}"
+                            f"Multi-section analysis validation failed: {', '.join(issues)}",
+                            f"Section validations: {section_validations}"
                         )
                         return False
                 else:
                     self.log_test(
-                        "Stock Analysis Endpoint", 
+                        "Multi-Section Analysis Endpoint", 
                         "FAIL", 
-                        f"Stock analysis response missing fields: {missing_fields}",
+                        f"Multi-section analysis response missing fields: {missing_fields}",
                         f"Response keys: {list(data.keys())}"
                     )
                     return False
             else:
                 self.log_test(
-                    "Stock Analysis Endpoint", 
+                    "Multi-Section Analysis Endpoint", 
                     "FAIL", 
-                    f"Stock analysis returned status code {response.status_code}",
+                    f"Multi-section analysis returned status code {response.status_code}",
                     f"Response: {response.text}"
                 )
                 return False
                 
         except Exception as e:
             self.log_test(
-                "Stock Analysis Endpoint", 
+                "Multi-Section Analysis Endpoint", 
                 "FAIL", 
-                f"Stock analysis request failed: {str(e)}"
+                f"Multi-section analysis request failed: {str(e)}"
             )
             return False
+
+    def test_stock_analysis_endpoint(self, symbol="AAPL", exchange="NASDAQ"):
+        """Test the main stock analysis endpoint with image upload (legacy compatibility test)"""
+        return self.test_multi_section_analysis_endpoint(symbol, exchange)
 
     def test_legacy_stock_analysis_endpoint(self, symbol="AAPL", exchange="NASDAQ"):
         """Test the legacy stock analysis endpoint"""
