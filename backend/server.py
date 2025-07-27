@@ -671,7 +671,7 @@ async def upload_image(file: UploadFile = File(...)):
         user_friendly_error = get_user_friendly_error(str(e))
         raise HTTPException(status_code=500, detail=user_friendly_error)
 
-# Main endpoint for stock analysis (Updated for image uploads)
+# Main endpoint for stock analysis (Updated for multi-section analysis)
 @app.post("/api/analyze-stock", response_model=StockAnalysisResponse)
 async def analyze_stock(
     symbol: str = Form(...),
@@ -679,29 +679,68 @@ async def analyze_stock(
     image: UploadFile = File(...)
 ):
     """
-    Analyze a stock using uploaded chart image and AI-powered analysis
+    Analyze a stock using uploaded chart image and AI-powered multi-section analysis
     """
     try:
-        print(f"Starting analysis for {symbol} on {exchange}")
+        print(f"Starting multi-section analysis for {symbol} on {exchange}")
         
         # Step 1: Process uploaded image
         chart_image_base64 = await process_uploaded_image(image)
         print("Chart image processed successfully")
         
-        # Step 2: Analyze with Gemini (with fallback)
-        analysis = await analyze_stock_with_gemini(
-            symbol, 
-            exchange, 
-            chart_image_base64
+        # Step 2: Generate all four analysis sections concurrently
+        print("Starting multi-section analysis...")
+        
+        # Run all analyses concurrently for better performance
+        fundamental_task = get_fundamental_analysis(symbol, exchange)
+        sentiment_task = get_sentiment_analysis(symbol, exchange)
+        technical_task = get_technical_analysis(symbol, exchange, chart_image_base64)
+        recommendations_task = get_recommendations(symbol, exchange)
+        
+        # Wait for all analyses to complete
+        fundamental_analysis, sentiment_analysis, technical_analysis, recommendations = await asyncio.gather(
+            fundamental_task,
+            sentiment_task, 
+            technical_task,
+            recommendations_task,
+            return_exceptions=True
         )
-        print("Analysis completed successfully")
+        
+        # Check for any exceptions
+        analyses = [fundamental_analysis, sentiment_analysis, technical_analysis, recommendations]
+        section_names = ['Fundamental', 'Sentiment', 'Technical', 'Recommendations']
+        
+        for i, analysis in enumerate(analyses):
+            if isinstance(analysis, Exception):
+                print(f"❌ {section_names[i]} analysis failed: {str(analysis)}")
+                # Replace failed analysis with error message
+                analyses[i] = f"⚠️ {section_names[i]} analysis temporarily unavailable. Please try again."
+        
+        fundamental_analysis, sentiment_analysis, technical_analysis, recommendations = analyses
+        
+        print("All analyses completed successfully")
+        
+        # Create combined legacy analysis for backward compatibility
+        legacy_analysis = f"""📊 Stock Analysis Report
+
+📌 Symbol: {symbol.upper()}
+📅 Timeframe: Multi-Section Analysis
+🔍 Exchange: {exchange.upper()}
+
+This is a comprehensive multi-section analysis. Please use the individual sections (Fundamental, Sentiment, Technical, Recommendations) for detailed insights.
+
+Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
         
         # Step 3: Return comprehensive response
         return StockAnalysisResponse(
             symbol=symbol.upper(),
             exchange=exchange.upper(),
             chart_image=f"data:image/png;base64,{chart_image_base64}",
-            analysis=analysis,
+            analysis=legacy_analysis,  # Legacy field
+            fundamental_analysis=fundamental_analysis,
+            sentiment_analysis=sentiment_analysis,
+            technical_analysis=technical_analysis,
+            recommendations=recommendations,
             timestamp=datetime.now().isoformat()
         )
         
