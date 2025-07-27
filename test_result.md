@@ -431,21 +431,20 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.0"
-  test_sequence: 1
+  version: "2.0"
+  test_sequence: 2
   run_ui: true
 
 test_plan:
   current_focus:
-    - "Image upload functionality"
-    - "Updated Gemini Pro Vision API integration"
-    - "Modified stock analysis endpoint"
-    - "Chart-Img API removal"
-    - "Image upload interface"
-    - "Updated stock input interface"
-    - "Chart display functionality"
-    - "Analysis report display"
-    - "Error handling and loading states"
+    - "Multi-section analysis system"
+    - "Fundamental analysis function"
+    - "Sentiment analysis function"
+    - "Technical analysis function"
+    - "Recommendations function"
+    - "Tabbed interface implementation"
+    - "Multi-section content display"
+    - "Tab navigation styling"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
