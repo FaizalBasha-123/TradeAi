@@ -102,7 +102,234 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Analyse the codebase and replace Chart-Img API with image upload functionality. Add upload button for users to upload stock chart images. Replace current Gemini prompt with new structured format for stock analysis. Remove Chart-Img API completely from codebase."
+user_problem_statement: "yeah good now listen in  the report on the top there must be four buttons as "Fundamental , Sentimental , Technical , Recommendations" and below these there must be a dynamic switching section with respect to the current selected buttons from the four and initially fundamental is selected and for fundamental working should be like-"📊 Stock Analysis Report
+📌 Symbol: TCS
+📅 Timeframe: Last 1 Year
+🔍 Exchange: NSE
+
+📊 Fundamental Analysis
+1. Revenue & Profitability
+Revenue Growth (YoY): ₹2,49,386 Cr → ₹2,59,188 Cr (↑ ~3.9%)
+
+Net Profit (YoY): ₹38,327 Cr → ₹42,303 Cr (↑ ~10.4%)
+
+EBITDA Margin: ~25.0%
+
+Net Profit Margin: ~16.3%
+
+2. Earnings Per Share (EPS)
+TTM EPS: ₹115.5
+
+EPS Growth (YoY): 9.5%
+
+Projected EPS FY26: ₹126 – ₹130
+
+3. Return Ratios
+ROE (Return on Equity): ~47%
+
+ROCE (Return on Capital Employed): ~54%
+
+ROA (Return on Assets): ~30%
+
+4. Valuation Metrics
+P/E Ratio (TTM): ~31.5x
+
+Industry P/E: ~27x (Slightly overvalued)
+
+P/B Ratio: ~14.7
+
+PEG Ratio: ~2.2 (moderate)
+
+5. Debt Analysis
+Debt to Equity: 0.04 (Almost debt-free)
+
+Interest Coverage Ratio: > 100 (Excellent)
+
+6. Cash Flow Health
+Operating Cash Flow: ₹61,728 Cr (healthy)
+
+Free Cash Flow: ₹48,000 Cr
+
+FCF Yield: ~3.3%
+
+7. Dividend Track Record
+Dividend Yield: ~3.16%
+
+5-Year Dividend CAGR: 17%
+
+Payout Ratio: ~75% (consistent high payouts)
+
+8. Promoter & Institutional Holding
+Promoter Holding: 72.3% (Stable)
+
+FII Holding: 12.6%
+
+DII Holding: 10.9%
+
+9. Moat & Business Outlook
+Strong Moat: Brand trust, client retention, and industry leadership
+
+Client Base: >1200 global clients including multiple Fortune 500 companies
+
+Order Book: Robust TCV of ~$42.7B
+
+Future Outlook: Expanding in cloud, AI, and digital transformation segments
+
+✅ Summary (Fundamentals Only)
+Strengths:
+
+Consistent revenue & profit growth
+
+Debt-free with high cash reserves
+
+High ROE and strong dividend policy
+
+Leader in IT services with a global footprint
+
+Risks:
+
+Rich valuation (high P/E vs peers)
+
+FX fluctuations due to high USD exposure
+
+Dependency on global IT demand cycles
+
+Verdict:
+✔️ Strong fundamentals for long-term holding
+⚠️ For swing trading, check earnings dates, corporate actions, and news events impacting short-term sentiment.", and for sentimental working should be like-"💬 Sentiment Analysis – AI Mode (Based on Recent News)
+✅ 1. What We Must Check
+To generate reliable Sentiment Analysis, your AI prompt should guide Gemini to analyze recent news headlines, events, and trends. Here's what it should check:
+
+Metric	Description
+🔴 Positive/Negative/Neutral	Overall sentiment polarity
+📰 Recent News Summary	Key headlines and events in the past 30 days
+🔄 Impact on Stock	Interpretation of how news affects investor behavior
+🏦 Sector Trend	Sentiment of the overall IT sector if available
+🗣️ Public/Media Tone	Investor confidence, trust, or panic signals
+🔎 Keywords	Words like "growth", "fraud", "expansion", "layoffs" etc.
+🕵️ AI Reasoning	AI should extract sentiment context from multiple stories
+
+🧠 2. Gemini Prompt for Sentiment Analysis
+text
+Copy
+Edit
+You are an AI financial analyst for Indian stocks. Based on recent publicly available news (from past 30 days), provide a structured **Sentiment Analysis Report** for the NSE-listed stock {{symbol}}. Use an AI mode to simulate online search reasoning. Return your analysis in this format:
+
+---
+💬 Stock Sentiment Report  
+📌 Symbol: {{symbol}}  
+📅 Timeframe: Last 30 Days  
+🔍 Source: News Headlines & Market Events
+
+📢 News-Based Summary  
+- Headline 1:  
+- Headline 2:  
+- Headline 3:  
+
+📈 Sentiment Overview  
+- Overall Sentiment: Positive / Neutral / Negative  
+- Investor Mood: Cautious / Bullish / Panic Driven  
+- Sector Sentiment: Strong / Weak / Mixed  
+
+🔎 Keyword Highlights  
+- Positive Mentions: (e.g., "New client deals", "Cloud expansion")  
+- Negative Mentions: (e.g., "Attrition", "IT slowdown", "Layoffs")  
+
+🧠 AI Reasoning  
+- Based on the news above, the sentiment is {{verdict}} because... (explain in 2–3 lines).
+
+✅ Verdict:  
+(Example: Slightly bullish due to consistent deal wins and sector recovery.)", and for technical working should be like-"📈 Technical Analysis – AI Mode (Image-based)
+✅ 1. What Gemini Should Analyze from Chart Image
+Your prompt to Gemini should guide it to detect key technical signals from the image, such as:
+
+Category	Details to Extract
+📊 Trend	Overall trend direction (uptrend, downtrend, sideways)
+🔺 Breakout	Resistance breakout or support breakdown
+📏 Patterns	Chart patterns: triangle, head and shoulders, flag, etc.
+📈 Indicators	RSI, SMA/EMA crossovers, MACD, Bollinger Bands
+🔄 Volume	Spike in volume near breakout or breakdown
+🎯 Entry & Stop Loss	Suggested price action zone for entry/exit
+🧠 AI Summary	Human-style explanation based on image features
+
+🧠 2. Gemini Prompt for Image-Based Technical Analysis
+When sending the chart image to Gemini, pair it with this text prompt:
+
+text
+Copy
+Edit
+You are a professional technical analyst. Based on the attached 1-day timeframe chart of {{symbol}} (6-month or 1-year view), provide a detailed Technical Analysis Report. Your response should follow this format:
+
+---
+📈 Technical Analysis Report  
+📌 Symbol: {{symbol}}  
+📅 Timeframe: 1-Day Chart (Last 6 Months)  
+🖼️ Chart: [analyzed image attached]
+
+📊 Trend Analysis  
+- Overall trend: Uptrend / Downtrend / Sideways  
+- Support Zone: ₹xxx – ₹xxx  
+- Resistance Zone: ₹xxx – ₹xxx
+
+🔺 Breakout/Breakdown  
+- Breakout Detected: Yes / No  
+- Level: ₹xxx  
+- Volume Confirmation: Yes / No
+
+📐 Chart Patterns  
+- Pattern Detected: (e.g., Ascending Triangle, Cup & Handle, Double Bottom)  
+- Pattern Validity: Strong / Weak
+
+📉 Indicators  
+- RSI: xxx (Overbought / Oversold / Neutral)  
+- SMA/EMA Crossover: (e.g., 50-SMA crossed 200-SMA → Golden Cross)  
+- MACD Signal: Bullish / Bearish  
+- Bollinger Band Status: Price near Upper / Lower band?
+
+🎯 Entry/Exit Recommendation  
+- Suggested Entry Range: ₹xxx – ₹xxx  
+- Stop-Loss: ₹xxx  
+- Target 1: ₹xxx  
+- Target 2: ₹xxx
+
+🧠 AI Summary  
+(Explain the chart-based analysis in 2–3 sentences in natural language.)
+
+✅ Verdict:  
+(Example: Bullish setup with strong breakout from resistance + RSI supportive.)", and for recommendation working should be like-"✅ Recommendation Section – Structure & Logic
+📌 Purpose:
+To provide a short-term (swing) and optionally long-term actionable recommendation based on the combined analysis.
+
+🧱 Recommendation Format
+text
+Copy
+Edit
+📌 Recommendation Summary  
+📍 Stock: {{symbol}}  
+📆 Timeframe: Swing (2–10 days)  
+📈 Market View: Bullish / Bearish / Cautious
+
+🧩 Combined Outlook  
+- 🧠 Fundamentals: Strong / Weak / Neutral (reason)
+- 💬 Sentiment: Positive / Negative / Neutral (reason)
+- 📈 Technical: Bullish / Bearish / Neutral (reason)
+
+🎯 Swing Trade Recommendation  
+- Entry Range: ₹xxx – ₹xxx  
+- Stop-Loss: ₹xxx  
+- Target 1: ₹xxx  
+- Target 2: ₹xxx  
+- Risk Level: Low / Medium / High  
+- Confidence Score: 80–90% (AI-estimated based on alignment of signals)
+
+📆 Holding Period Suggestion: 5–7 trading days (can vary)
+
+🔎 Reasoning:  
+(Explain why this trade setup is favorable or risky based on combined analysis)
+
+✅ Final Verdict:  
+✔️ Action: Consider Entering / Wait & Watch / Avoid  
+📢 Notes: (Earnings approaching / Sector uncertainty / Confirm on volume tomorrow etc.)" and when the user press the analyze stock chart there must be three kind of prompts should retrieve the responses as i told above and display to their respective sections and the current image passing with the prompt can be used for the technical as a reference"
 
 backend:
   - task: "Image upload functionality"
