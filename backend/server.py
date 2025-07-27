@@ -46,7 +46,11 @@ class StockAnalysisResponse(BaseModel):
     symbol: str
     exchange: str
     chart_image: str
-    analysis: str
+    analysis: str  # Legacy field for backward compatibility
+    fundamental_analysis: str
+    sentiment_analysis: str
+    technical_analysis: str
+    recommendations: str
     timestamp: str
 
 # Health check endpoint
