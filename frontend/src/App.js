@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 const App = () => {
-  const [symbol, setSymbol] = useState('TCS');
+  const [symbol, setSymbol] = useState('AAPL');
   const [exchange, setExchange] = useState('NSE (India)');
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -13,11 +13,6 @@ const App = () => {
 
   // Determine backend URL based on environment
   const getBackendUrl = () => {
-    // For Vercel deployment, use relative API routes
-    if (process.env.NODE_ENV === 'production' && window.location.hostname.includes('vercel.app')) {
-      return '';  // Use relative URLs for Vercel
-    }
-    // For localhost or custom backend URL
     return process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
   };
 
