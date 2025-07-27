@@ -98,6 +98,32 @@ const App = () => {
       .replace(/\n/g, '<br/>');
   };
 
+  // Tab configuration
+  const tabs = [
+    { id: 'fundamental', label: 'Fundamental', icon: '📊' },
+    { id: 'sentiment', label: 'Sentimental', icon: '💬' },
+    { id: 'technical', label: 'Technical', icon: '📈' },
+    { id: 'recommendations', label: 'Recommendations', icon: '📌' }
+  ];
+
+  // Get current tab content
+  const getCurrentTabContent = () => {
+    if (!analysis) return null;
+    
+    switch (activeTab) {
+      case 'fundamental':
+        return analysis.fundamental_analysis || 'Fundamental analysis not available';
+      case 'sentiment':
+        return analysis.sentiment_analysis || 'Sentiment analysis not available';
+      case 'technical':
+        return analysis.technical_analysis || 'Technical analysis not available';
+      case 'recommendations':
+        return analysis.recommendations || 'Recommendations not available';
+      default:
+        return 'Please select a tab to view analysis';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
