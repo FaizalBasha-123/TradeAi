@@ -7,7 +7,7 @@ const App = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [analysis, setAnalysis] = useState(null);
-  const [activeTab, setActiveTab] = useState('fundamental'); // New state for active tab
+  const [activeTab, setActiveTab] = useState('recommendations'); // New state for active tab - starting with recommendations
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
