@@ -1,0 +1,23 @@
+{
+  "name": "stock-analysis-app",
+  "version": "1.0.0",
+  "description": "AI-powered Stock Analysis Tool with image upload functionality",
+  "scripts": {
+    "setup": "./setup.sh",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && python server.py",
+    "frontend": "cd frontend && yarn start",
+    "build": "cd frontend && yarn build",
+    "test": "cd backend && python -m pytest && cd ../frontend && yarn test --watchAll=false"
+  },
+  "keywords": ["stock-analysis", "ai", "gemini", "react", "fastapi"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "python": ">=3.8.0"
+  }
+}
