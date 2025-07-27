@@ -289,7 +289,7 @@ const App = () => {
             {/* Multi-Section Analysis Report */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-                🤖 AI Analysis Report
+                🤖 AI Analysis Report - Swing Trade
               </h2>
               
               {/* Tab Navigation */}
