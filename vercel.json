@@ -26,10 +26,5 @@
   ],
   "env": {
     "GEMINI_API_KEY": "@gemini_api_key"
-  },
-  "functions": {
-    "api/*.py": {
-      "maxDuration": 30
-    }
   }
 }
