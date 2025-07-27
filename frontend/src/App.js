@@ -98,12 +98,12 @@ const App = () => {
       .replace(/\n/g, '<br/>');
   };
 
-  // Tab configuration
+  // Tab configuration - Reordered to show Recommendations first
   const tabs = [
+    { id: 'recommendations', label: 'Recommendations', icon: '📌' },
     { id: 'fundamental', label: 'Fundamental', icon: '📊' },
     { id: 'sentiment', label: 'Sentimental', icon: '💬' },
-    { id: 'technical', label: 'Technical', icon: '📈' },
-    { id: 'recommendations', label: 'Recommendations', icon: '📌' }
+    { id: 'technical', label: 'Technical', icon: '📈' }
   ];
 
   // Get current tab content
