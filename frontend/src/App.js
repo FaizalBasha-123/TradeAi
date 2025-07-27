@@ -13,6 +13,11 @@ const App = () => {
 
   // Determine backend URL based on environment
   const getBackendUrl = () => {
+    // For Vercel deployment, use relative API routes
+    if (process.env.NODE_ENV === 'production' && window.location.hostname.includes('vercel.app')) {
+      return '';  // Use relative URLs for Vercel
+    }
+    // For localhost or custom backend URL
     return process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
   };
 
@@ -177,8 +182,8 @@ const App = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Upload Chart Image
             </label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors">
-              <div className="space-y-1 text-center">
+            <label htmlFor="file-upload" className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors cursor-pointer">
+              <div className="space-y-1 text-center w-full">
                 <svg
                   className="mx-auto h-12 w-12 text-gray-400"
                   stroke="currentColor"
@@ -192,26 +197,21 @@ const App = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <div className="flex text-sm text-gray-600">
-                  <label
-                    htmlFor="file-upload"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
-                  >
-                    <span>Upload chart image</span>
-                    <input
-                      id="file-upload"
-                      name="file-upload"
-                      type="file"
-                      accept="image/*"
-                      className="sr-only"
-                      onChange={handleFileSelect}
-                    />
-                  </label>
+                <div className="flex text-sm text-gray-600 justify-center">
+                  <span className="font-medium text-blue-600 hover:text-blue-500">Upload chart image</span>
                   <p className="pl-1">or drag and drop</p>
                 </div>
                 <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                <input
+                  id="file-upload"
+                  name="file-upload"
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  onChange={handleFileSelect}
+                />
               </div>
-            </div>
+            </label>
           </div>
 
           {/* Image Preview */}
@@ -289,7 +289,7 @@ const App = () => {
             {/* Multi-Section Analysis Report */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-                🤖 AI Analysis Report - Swing Trade
+                🤖 AI Analysis Report
               </h2>
               
               {/* Tab Navigation */}
