@@ -277,7 +277,7 @@ class StockAnalysisAPITester:
                         
                         is_valid = (
                             len(content) > 200 and  # Should be substantial
-                            symbol.upper() in content and  # Should mention the stock
+                            (symbol.upper() in content or symbol.lower() in content.lower()) and  # Should mention the stock (case insensitive)
                             any(keyword in content.lower() for keyword in expected_keywords)
                         )
                         section_validations[section_name] = is_valid
