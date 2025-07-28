@@ -3,7 +3,7 @@ import './App.css';
 
 const App = () => {
   const [symbol, setSymbol] = useState('TCS');
-  const [exchange, setExchange] = useState('NSE (India)');
+  const [exchange, setExchange] = useState('NSE');
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [analysis, setAnalysis] = useState(null);
