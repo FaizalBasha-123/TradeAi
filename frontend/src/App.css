@@ -5,28 +5,32 @@
 /* Custom styles for the Stock Analysis app */
 
 /* Analysis content formatting */
+
 .analysis-h1 {
-  @apply text-3xl font-bold text-gray-900 mb-4 mt-6 pb-2 border-b-2 border-blue-200;
+  @apply text-3xl font-bold mb-4 mt-6 pb-2 border-b-2;
+  @apply text-gray-900 border-blue-200; /* light */
 }
 
 .analysis-h2 {
-  @apply text-2xl font-semibold text-gray-800 mb-3 mt-6 text-blue-700;
+  @apply text-2xl font-semibold mb-3 mt-6;
+  @apply text-blue-700; /* light */
 }
 
 .analysis-h3 {
-  @apply text-xl font-medium text-gray-700 mb-2 mt-4 text-blue-600;
+  @apply text-xl font-medium mb-2 mt-4;
+  @apply text-blue-600; /* light */
 }
 
 .prose {
-  @apply text-gray-700 leading-relaxed;
+  @apply leading-relaxed text-gray-700; /* light */
 }
 
 .prose strong {
-  @apply font-semibold text-gray-900;
+  @apply font-semibold text-gray-900; /* light */
 }
 
 .prose em {
-  @apply italic text-gray-600;
+  @apply italic text-gray-600; /* light */
 }
 
 .prose li {
@@ -73,7 +77,7 @@
 
 /* Chart image styling */
 .chart-container {
-  @apply relative overflow-hidden rounded-lg shadow-md bg-gray-50;
+  @apply relative overflow-hidden rounded-lg shadow-md bg-gray-50 dark:bg-gray-900;
 }
 
 .chart-container img {
@@ -93,6 +97,31 @@
   .analysis-h3 {
     @apply text-lg;
   }
+}
+
+/* Dark mode overrides */
+.dark .analysis-h1 {
+  @apply text-white border-brand-800;
+}
+
+.dark .analysis-h2 {
+  @apply text-brand-300;
+}
+
+.dark .analysis-h3 {
+  @apply text-brand-400;
+}
+
+.dark .prose {
+  @apply text-gray-300;
+}
+
+.dark .prose strong {
+  @apply text-white;
+}
+
+.dark .prose em {
+  @apply text-gray-400;
 }
 
 /* Loading state improvements */

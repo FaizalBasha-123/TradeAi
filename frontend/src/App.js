@@ -120,15 +120,15 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gray-950 text-gray-100">
       {/* Header */}
-      <header className="bg-white shadow-lg">
+      <header className="bg-gray-900 shadow-lg border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-4xl font-bold text-white mb-2">
               📈 AI Stock Analysis Tool
             </h1>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-400">
               Upload your stock chart image and get AI-powered analysis with structured insights
             </p>
           </div>
@@ -137,12 +137,12 @@ const App = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Input Section */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Stock Analysis</h2>
+        <div className="bg-gray-900 rounded-xl shadow-lg p-6 mb-8 border border-gray-800">
+          <h2 className="text-2xl font-semibold text-white mb-6">Stock Analysis</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Stock Symbol
               </label>
               <input
@@ -150,18 +150,18 @@ const App = () => {
                 value={symbol}
                 onChange={(e) => setSymbol(e.target.value.toUpperCase())}
                 placeholder="e.g., AAPL, TCS"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Exchange
               </label>
               <select
                 value={exchange}
                 onChange={(e) => setExchange(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:ring-2 focus:ring-brand focus:border-transparent"
               >
                 <option value="NASDAQ">NASDAQ</option>
                 <option value="NYSE">NYSE</option>
@@ -174,10 +174,10 @@ const App = () => {
 
           {/* File Upload Section */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Upload Chart Image
             </label>
-            <label htmlFor="file-upload" className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors cursor-pointer">
+            <label htmlFor="file-upload" className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-700 border-dashed rounded-lg hover:border-brand transition-colors cursor-pointer bg-gray-800">
               <div className="space-y-1 text-center w-full">
                 <svg
                   className="mx-auto h-12 w-12 text-gray-400"
@@ -192,8 +192,8 @@ const App = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <div className="flex text-sm text-gray-600 justify-center">
-                  <span className="font-medium text-blue-600 hover:text-blue-500">Upload chart image</span>
+                <div className="flex text-sm text-gray-300 justify-center">
+                  <span className="font-medium text-brand hover:text-brand-400">Upload chart image</span>
                   <p className="pl-1">or drag and drop</p>
                 </div>
                 <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
@@ -212,12 +212,12 @@ const App = () => {
           {/* Image Preview */}
           {previewUrl && (
             <div className="mb-6">
-              <h3 className="text-lg font-medium text-gray-700 mb-3">Image Preview:</h3>
+              <h3 className="text-lg font-medium text-gray-300 mb-3">Image Preview:</h3>
               <div className="flex justify-center">
                 <img
                   src={previewUrl}
                   alt="Chart preview"
-                  className="max-w-full max-h-64 object-contain rounded-lg shadow-md"
+                  className="max-w-full max-h-64 object-contain rounded-lg shadow-md border border-gray-800 bg-gray-900"
                 />
               </div>
             </div>
@@ -228,7 +228,7 @@ const App = () => {
             <button
               onClick={handleAnalyze}
               disabled={loading || !selectedFile}
-              className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 flex items-center justify-center"
+              className="w-full md:w-auto bg-brand hover:bg-brand-700 disabled:bg-gray-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 flex items-center justify-center"
             >
               {loading ? (
                 <>
@@ -247,14 +247,14 @@ const App = () => {
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="bg-red-900/20 border border-red-800 rounded-lg p-4 mb-6">
             <div className="flex">
               <div className="flex-shrink-0">
-                <span className="text-red-500 text-xl">⚠️</span>
+                <span className="text-red-400 text-xl">⚠️</span>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Error</h3>
-                <p className="text-sm text-red-700 mt-1">{error}</p>
+                <h3 className="text-sm font-medium text-red-300">Error</h3>
+                <p className="text-sm text-red-400 mt-1">{error}</p>
               </div>
             </div>
           </div>
@@ -282,21 +282,21 @@ const App = () => {
             */}
 
             {/* Multi-Section Analysis Report */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+            <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800">
+              <h2 className="text-2xl font-semibold text-white mb-6">
                 🤖 AI Analysis Report - Swing Strategy
               </h2>
               
               {/* Tab Navigation */}
-              <div className="flex flex-wrap border-b border-gray-200 mb-6">
+              <div className="flex flex-wrap border-b border-gray-800 mb-6">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center px-4 py-3 mr-2 mb-2 text-sm font-medium rounded-t-lg transition-colors duration-200 ${
                       activeTab === tab.id
-                        ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-500'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                        ? 'bg-brand/10 text-brand border-b-2 border-brand'
+                        : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'
                     }`}
                   >
                     <span className="mr-2">{tab.icon}</span>
@@ -308,7 +308,7 @@ const App = () => {
               {/* Tab Content */}
               <div className="min-h-[400px]">
                 <div 
-                  className="prose prose-lg max-w-none"
+                  className="max-w-none leading-relaxed text-gray-300 space-y-4"
                   dangerouslySetInnerHTML={{ 
                     __html: formatAnalysis(getCurrentTabContent()) 
                   }}
@@ -320,9 +320,9 @@ const App = () => {
 
         {/* Loading State */}
         {loading && (
-          <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h3 className="text-lg font-medium text-gray-700 mb-2">Analyzing Stock Chart...</h3>
+          <div className="bg-gray-900 rounded-xl shadow-lg p-12 text-center border border-gray-800">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand mx-auto mb-4"></div>
+            <h3 className="text-lg font-medium text-gray-300 mb-2">Analyzing Stock Chart...</h3>
             <p className="text-gray-500">
               Processing your uploaded image and generating AI-powered analysis
             </p>
@@ -331,12 +331,12 @@ const App = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-6 mt-12">
+      <footer className="bg-gray-900 text-gray-300 py-6 mt-12 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-sm">
             📈 AI Stock Analysis Tool - Upload & Analyze with Gemini AI
           </p>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs text-gray-500 mt-2">
             Disclaimer: This tool is for educational purposes only. Not financial advice.
           </p>
         </div>

@@ -15,3 +15,18 @@ code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
         monospace;
 }
+
+/* Dark mode base styles */
+@layer base {
+    .dark body {
+        @apply bg-gray-950 text-gray-100;
+    }
+}
+
+/* Dark prose helpers (no typography plugin; keep as a no-op or custom style if needed) */
+@layer utilities {
+    .prose-dark {
+        color: rgb(209 213 219 / 1); /* text-gray-300 */
+        line-height: 1.75; /* leading-relaxed */
+    }
+}
